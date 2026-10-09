@@ -96,9 +96,9 @@ const SceneStack: React.FC<{ t: number }> = ({ t }) => {
   );
 };
 
-export type DigitalDivaProps = { showTimingDebug: boolean };
+export type DigitalDivaProps = { showTimingDebug: boolean; qa?: boolean };
 
-export const DigitalDiva: React.FC<DigitalDivaProps> = ({ showTimingDebug }) => {
+export const DigitalDiva: React.FC<DigitalDivaProps> = ({ showTimingDebug, qa = false }) => {
   ensureFonts();
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -108,7 +108,7 @@ export const DigitalDiva: React.FC<DigitalDivaProps> = ({ showTimingDebug }) => 
     <AbsoluteFill style={{ backgroundColor: C.bg, overflow: "hidden" }}>
       <Audio src={staticFile("audio/digital-diva.mp3")} />
       <SceneStack t={t} />
-      <LyricLayer groups={groups} layoutOf={layoutOfGroup} />
+      <LyricLayer groups={groups} layoutOf={layoutOfGroup} qa={qa} />
       <AbsoluteFill style={{ background: `radial-gradient(ellipse at 50% 120%, ${C.pink} 0%, transparent 50%)`, opacity: hit * 0.1, mixBlendMode: "screen", pointerEvents: "none" }} />
       <AbsoluteFill style={{ background: "radial-gradient(ellipse 80% 75% at 50% 50%, transparent 60%, rgba(0,0,0,0.45) 100%)", pointerEvents: "none" }} />
       <Img src={staticFile("noise.png")} style={{ position: "absolute", left: -((frame * 137) % 512), top: -((frame * 71) % 512), width: W + 1024, height: H + 1024, objectFit: "none", opacity: 0.045, mixBlendMode: "overlay", pointerEvents: "none" }} />

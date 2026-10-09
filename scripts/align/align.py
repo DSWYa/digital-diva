@@ -206,6 +206,18 @@ def main():
         w["e"] = max(w["e"], w["s"] + 0.06)
         w["s"], w["e"], w["c"] = round(w["s"], 2), round(w["e"], 2), round(w["c"], 2)
         if w["c"] < 0.5: w["u"] = True
+    # trim word ends to where the voice actually stops (only ever shortens; keeps the karaoke fill honest)
+    manual = {id(w) for ln in lines if ln.get("manual") for w in ln["words"]}
+    for w in flat:
+        if w.get("u") or id(w) in manual:
+            continue
+        i0, i1 = int((w["s"] + 0.1) * rate), int(w["e"] * rate)
+        quiet = 0
+        for i in range(i0, min(i1, len(rms))):
+            quiet = quiet + 1 if rms[i] < 0.06 else 0
+            if quiet >= 10:
+                w["e"] = round(max(w["s"] + 0.08, (i - quiet + 1) / rate + 0.05), 2)
+                break
     for ln in lines:
         ln["start"], ln["end"] = ln["words"][0]["s"], ln["words"][-1]["e"]
         unc = sum(1 for w in ln["words"] if w.get("u")) / len(ln["words"])

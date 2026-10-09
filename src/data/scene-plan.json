@@ -6,7 +6,7 @@
     { "at": "L005", "scene": "inbox", "lyric": "log", "items": { "L005": "ring", "L006": "msg", "L007": "letter", "L008": "chair" }, "transition": "wipe" },
     { "at": "L009", "scene": "filter", "lyric": "left", "items": { "L009": "polite", "L010": "feelings", "L011": "coffee", "L012": "make" }, "transition": "wipe" },
     { "at": "L013", "scene": "queue", "lyric": "top", "items": { "L013": "bucks", "L014": "ducks", "L015": "vows", "L016": "cow" }, "transition": "glitch" },
-    { "at": 55.95, "scene": "notify", "lyric": "top", "items": { "L017": "bells", "L018": "bells", "L019": "globe", "L020": "zoom" }, "transition": "wipe" },
+    { "at": "L017", "scene": "notify", "lyric": "top", "items": { "L017": "bells", "L018": "bells", "L019": "globe", "L020": "zoom" }, "transition": "wipe" },
     { "at": "L021", "scene": "specimen", "variant": "potato", "lyric": { "kind": "path", "x": 0, "y": 0, "w": 1920, "size": 80, "align": "center", "path": "M 260 760 Q 960 1010 1660 760" }, "transition": "cut" },
     { "at": "L022", "scene": "chorus", "lyric": "top", "items": { "L023": "stage", "L024": "metronome", "L025": "overload", "L026": "numbers", "L028": "dice", "L029": "freeze" }, "transition": "flash" },
     { "at": "L030", "scene": "specimen", "variant": "printer", "lyric": "bottom", "transition": "cut" },

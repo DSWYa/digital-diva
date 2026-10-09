@@ -30,6 +30,8 @@
     "align": "python scripts/align/transcribe.py && python scripts/align/align.py",
     "align:remap": "python scripts/align/align.py",
     "render": "remotion render DigitalDiva out/digital-diva.mp4 --codec=h264 --crf=18",
-    "render:test": "remotion render DigitalDiva out/test-chorus.mp4 --codec=h264 --frames=1890-2190"
+    "render:test": "remotion render DigitalDiva out/test-chorus.mp4 --codec=h264 --frames=1890-2190",
+    "qa": "node scripts/qa/run.mjs",
+    "qa:bounds": "node scripts/qa/bounds.mjs"
   }
 }

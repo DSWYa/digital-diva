@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useLayoutEffect, useRef } from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { C, F } from "../theme";
 import { Line, lines, Word } from "../lib/timing";
@@ -24,7 +24,7 @@ const isAccent = (w: string) => ACCENT.test(w.replace(/[^A-Za-z'-]/g, ""));
 
 /* ---------- grouping: lines appear in couplets ---------- */
 export type Group = { ids: number[]; start: number; end: number };
-const EXIT = 0.22;
+export const EXIT = 0.22;
 
 export const buildGroups = (segOf: (t: number) => number): Group[] => {
   const groups: number[][] = [];
@@ -55,10 +55,12 @@ export const buildGroups = (segOf: (t: number) => number): Group[] => {
     const next = groups[gi + 1] ? lines[groups[gi + 1][0]] : undefined;
     const prevEnd = out.length ? out[out.length - 1].end : -Infinity;
     // wait for the previous couplet to finish leaving, but never start after the first word
-    const start = Math.min(first.start - 0.12, Math.max(first.start - 0.35, prevEnd + EXIT));
+    const start = Math.min(first.start - 0.12, Math.max(first.start - 0.35, prevEnd + EXIT * 0.5));
     const hold = last.style === "punchline" || last.style === "spoken" ? 1.8 : 1.2;
     const end = Math.min(last.end + hold, next ? next.start - 0.45 : Infinity);
-    out.push({ ids, start, end: Math.max(end, last.end - 0.2) });
+    // never fade the final word while it is still being sung (short crossfade instead)
+    const lw = last.words[last.words.length - 1];
+    out.push({ ids, start, end: Math.max(end, Math.min(lw.e, lw.s + 0.5) - 0.02) });
   });
   return out;
 };
@@ -89,7 +91,7 @@ const Glyphs: React.FC<{ w: Word; t: number; paper: boolean; mono: boolean }> = 
 };
 
 /* ---------- layouts ---------- */
-const fitSize = (layout: LyricLayout, texts: string[]) => {
+export const fitSize = (layout: LyricLayout, texts: string[]) => {
   const longest = Math.max(...texts.map((s) => s.length));
   const cw = layout.kind === "log" ? 0.6 : 0.56;
   // allow wrapping into up to 3 rows per lyric line if it is very long
@@ -97,7 +99,7 @@ const fitSize = (layout: LyricLayout, texts: string[]) => {
   for (const rows of [1, 2, 3]) {
     const s = Math.min(layout.size, (layout.w * rows) / (longest * cw * (rows === 1 ? 1 : 1.12)));
     best = s;
-    if (s >= layout.size * 0.72) break;
+    if (s >= layout.size * (layout.kind === "log" ? 0.88 : 0.72)) break;
   }
   return best;
 };
@@ -128,7 +130,18 @@ const BlockGroup: React.FC<{ g: Group; layout: LyricLayout; t: number }> = ({ g,
         const l = lines[li];
         const response = l.style === "response";
         return (
-          <div key={l.id} style={{ marginBottom: mono ? 0 : size * 0.06, paddingLeft: response && !mono ? size * 0.6 : 0 }}>
+          <div
+            key={l.id}
+            style={{
+              marginBottom: mono ? 0 : size * 0.06,
+              paddingLeft: response && !mono ? size * 0.6 : 0,
+              // call-and-response punchlines land like a stamp
+              transformOrigin: "0% 60%",
+              transform: response ? `scale(${1 + 0.45 * (1 - ease((t - l.start + 0.05) / 0.22))}) rotate(${-2 * (1 - ease((t - l.start) / 0.3))}deg)` : undefined,
+              fontWeight: response ? (mono ? 600 : 800) : undefined,
+              fontSize: response ? "1.25em" : undefined,
+            }}
+          >
             {mono && <span style={{ color: response ? C.pink : paper ? "#a7a4aa" : "#5f5c63" }}>{response ? "→ " : "# "}</span>}
             {!mono && response && <span style={{ color: C.pink }}>→ </span>}
             {l.words.map((w, wi) => {
@@ -227,13 +240,31 @@ const SlamGroup: React.FC<{ g: Group; layout: LyricLayout; t: number }> = ({ g, 
   );
 };
 
-export const LyricLayer: React.FC<{ groups: Group[]; layoutOf: (g: Group) => LyricLayout }> = ({ groups, layoutOf }) => {
+export const LyricLayer: React.FC<{ groups: Group[]; layoutOf: (g: Group) => LyricLayout; qa?: boolean }> = ({ groups, layoutOf, qa }) => {
   const f = useCurrentFrame();
+  const ref = useRef<HTMLDivElement>(null);
+  // QA mode: log the on-screen bounds of every lyric glyph run (read by scripts/qa/bounds.sh)
+  useLayoutEffect(() => {
+    if (!qa || !ref.current) return;
+    const root = ref.current.getBoundingClientRect();
+    const k = root.width > 0 ? 1920 / root.width : 1; // composition px per screen px
+    const r = { x0: 1e9, y0: 1e9, x1: -1e9, y1: -1e9 };
+    ref.current.querySelectorAll("span,text").forEach((el) => {
+      const b = el.getBoundingClientRect();
+      if (b.width === 0) return;
+      r.x0 = Math.min(r.x0, (b.left - root.left) * k);
+      r.y0 = Math.min(r.y0, (b.top - root.top) * k);
+      r.x1 = Math.max(r.x1, (b.right - root.left) * k);
+      r.y1 = Math.max(r.y1, (b.bottom - root.top) * k);
+    });
+    const size = ref.current.querySelector("div[style*='font-size'], text");
+    console.log(`QA-BOUNDS ${JSON.stringify({ f, ...r, font: size ? getComputedStyle(size).fontSize : null })}`);
+  });
   const { fps } = useVideoConfig();
   const t = f / fps;
   const visible = groups.filter((g) => t >= g.start && t <= g.end + EXIT);
   return (
-    <AbsoluteFill style={{ pointerEvents: "none" }}>
+    <AbsoluteFill ref={ref} style={{ pointerEvents: "none" }}>
       {visible.slice(-2).map((g) => {
         const layout = layoutOf(g);
         const out = clamp01((t - g.end) / EXIT);

@@ -32,7 +32,16 @@ export const PRESETS: Record<string, LyricLayout> = {
 const SLAM: LyricLayout = { kind: "slam", x: 100, y: 330, w: 1720, size: 190 };
 
 const LEAD = 0.45;
-const resolveAt = (at: string | number) => (typeof at === "number" ? at : Math.max(0, (lineById[at]?.start ?? 0) - LEAD));
+/** When a change keyed to line `id` may happen: shortly before it, but never while the previous line is still being sung. */
+const switchTime = (id: string, lead: number) => {
+  const l = lineById[id];
+  if (!l) return Infinity;
+  const i = lines.indexOf(l);
+  const prev = lines[i - 1];
+  const prevEnd = prev ? prev.words[prev.words.length - 1].e : 0;
+  return Math.min(l.start - 0.05, Math.max(l.start - lead, prevEnd - 0.05));
+};
+const resolveAt = (at: string | number) => (typeof at === "number" ? at : Math.max(0, switchTime(at, LEAD)));
 
 const raw = (planJson as unknown as { segments: RawSegment[] }).segments;
 const starts = raw.map((s) => resolveAt(s.at));
@@ -67,7 +76,7 @@ export const currentItem = (seg: Segment, t: number) => {
   let name: string | undefined;
   let since = -Infinity;
   for (const [lineId, v] of Object.entries(seg.items)) {
-    const st = (lineById[lineId]?.start ?? Infinity) - 0.3;
+    const st = switchTime(lineId, 0.3);
     if (st <= t && st >= since) {
       name = v;
       since = st;
