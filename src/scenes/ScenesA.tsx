@@ -149,10 +149,10 @@ export const Inbox: React.FC<SceneProps> = ({ seg, t, lt }) => {
       <Layer depth={0.4}>
         <Hud tl="inbox.log" tr={name === "newmsg" ? "unread 1" : `priority × 2`} color="#8d8a90" accent={name === "newmsg" ? "tr" : undefined} />
         {rows.map(([ts, text, hot], i) => (
-          <LogRow key={ts + text} y={420 + i * 64} ts={ts} text={text} hot={hot} age={i === rows.length - 1 ? it.age - 0.3 : 1} />
+          <LogRow key={ts + text} y={500 + i * 64} ts={ts} text={text} hot={hot} age={i === rows.length - 1 ? it.age - 0.3 : 1} />
         ))}
         {name === "thanks" && (
-          <div style={{ position: "absolute", left: 80, top: 600, fontFamily: F.sans, fontWeight: 800, fontSize: 120, color: C.paperInk, letterSpacing: "-0.04em" }}>
+          <div style={{ position: "absolute", left: 80, top: 660, fontFamily: F.sans, fontWeight: 800, fontSize: 120, color: C.paperInk, letterSpacing: "-0.04em" }}>
             {fmt(thanks)}
             <span style={{ fontFamily: F.mono, fontWeight: 400, fontSize: 26, color: C.pink, marginLeft: 20, letterSpacing: 0 }}>thank-yous received</span>
           </div>

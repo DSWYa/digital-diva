@@ -231,7 +231,7 @@ export const QA: React.FC<SceneProps> = ({ seg, t, lt }) => {
         <Hud tl="requests.log" tr="playback × 1" color="#8d8a90" />
         {rows.map(([id, req, res], i) => {
           const age = t - ((lineById[id]?.start ?? 1e9) - 0.3);
-          return <LogRow key={id} y={460 + i * 70} ts={res} text={req} age={age - 0.6} hot={i === rows.length - 1 || res.startsWith("410")} size={28} />;
+          return <LogRow key={id} y={520 + i * 70} ts={res} text={req} age={age - 0.6} hot={i === rows.length - 1 || res.startsWith("410")} size={28} />;
         })}
       </Layer>
       <Layer depth={1}>
@@ -280,7 +280,7 @@ export const CatScene: React.FC<SceneProps> = ({ t, lt }) => {
       </Layer>
       <Layer depth={0.4}>
         <Hud tl="terminal — tty1" tr={granted ? "access granted" : "auth: pending"} color="#8d8a90" accent={granted ? "tr" : undefined} />
-        <div style={{ position: "absolute", left: 80, top: 470, fontFamily: F.mono, fontSize: 30, color: C.paperInk, lineHeight: 1.6, whiteSpace: "pre" }}>
+        <div style={{ position: "absolute", left: 80, top: 520, fontFamily: F.mono, fontSize: 30, color: C.paperInk, lineHeight: 1.6, whiteSpace: "pre" }}>
           {cmds.slice(0, Math.floor(lt * 3) + 1).join("\n")}
           {granted && <div style={{ color: C.pink, fontWeight: 600 }}>{"ACCESS GRANTED  (purr-fect)"}</div>}
         </div>

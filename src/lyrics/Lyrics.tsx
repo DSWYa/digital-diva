@@ -218,16 +218,18 @@ const SlamGroup: React.FC<{ g: Group; layout: LyricLayout; t: number }> = ({ g, 
     >
       {l.words.map((w, i) => {
         const dt = t - w.s;
-        const k = ease(dt / 0.18);
+        const q = clamp01(dt / 0.22) - 1;
+        const k = 1 + 2.6 * q * q * q + 1.6 * q * q; // back-out: 0 → ~1.06 → 1
         const active = dt >= 0 && dt < Math.max(0.15, w.e - w.s);
         return (
           <span
             key={i}
             style={{
               display: "inline-block",
-              marginRight: "0.18em",
+              marginRight: "0.24em",
               opacity: dt < -0.02 ? 0 : 1,
-              transform: `scale(${dt < 0 ? 1.6 : 1.6 - 0.6 * k})`,
+              transform: `scale(${dt < 0 ? 0.75 : 0.75 + 0.25 * k})`,
+              transformOrigin: "50% 70%",
               color: active ? C.pink : isAccent(w.t) ? C.pink : C.white,
               textShadow: active ? `0 0 40px rgba(255,46,138,0.9)` : `0 0 24px rgba(255,255,255,0.25)`,
             }}
