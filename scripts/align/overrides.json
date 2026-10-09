@@ -1,0 +1,4 @@
+{
+  "_doc": "Manual line timings (seconds) for lines the recogniser cannot hear. Words are spread by syllable and flagged uncertain. Re-run: python scripts/align/align.py",
+  "L067": { "start": 167.55, "end": 171.6, "note": "Robotic voice is buried under the glitch drop; placed on the drop + faint vocal blip at 170.9-171.5 s" }
+}

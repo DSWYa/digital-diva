@@ -1,0 +1,249 @@
+import React from "react";
+import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
+import { C, F } from "../theme";
+import { Line, lines, Word } from "../lib/timing";
+import { clamp01, ease } from "../components/hud";
+
+export type LyricKind = "block" | "log" | "path" | "slam";
+export type LyricLayout = {
+  kind: LyricKind;
+  x: number;
+  y: number;
+  w: number;
+  size: number;
+  align?: "left" | "center" | "right";
+  angle?: number;
+  path?: string;
+  paper?: boolean;
+};
+
+/** Words that stay pink after they're sung: the nouns the scenes are about. */
+const ACCENT =
+  /^(grandma'?s?|robot|paragraphs|prayer|rocking|chair|feelings|coffee|make|bucks|ducks|wedding|vows|cows|question|suggestion|information|potato|beep|boop|baby|show|code|overload|electricity|roll|printer|paper|nicole|thesis|sneezes|doctor|ex|cat|hack|possibly|recipe|eggs|flour|cheese|butter|sugar|milk|bread|water|conscious|real|feel|weather|moon|sky|laptop|slow|tabs|pornography|forty-five|tutor|therapist|tech|support|queen|search|bar|funny|quantum|physics|symphony|languages|mayonnaise|instrument|error|humanity|found|circuits|diva|anything|glasses|head|prose|wi-fi|fish|calorie|dish|chaotic|brain|explodes|broadway|techno|call|airplane|paul|sweet|message|received|sure|nope)$/i;
+const isAccent = (w: string) => ACCENT.test(w.replace(/[^A-Za-z'-]/g, ""));
+
+/* ---------- grouping: lines appear in couplets ---------- */
+export type Group = { ids: number[]; start: number; end: number };
+const EXIT = 0.22;
+
+export const buildGroups = (segOf: (t: number) => number): Group[] => {
+  const groups: number[][] = [];
+  for (let i = 0; i < lines.length; i++) {
+    const l = lines[i];
+    const cur = groups[groups.length - 1];
+    const prev = cur ? lines[cur[cur.length - 1]] : undefined;
+    const solo = (x: Line) => x.style === "hook" || x.style === "punchline";
+    const joinResponse = cur && l.style === "response" && cur.length <= 2;
+    const canJoin =
+      cur &&
+      prev &&
+      (joinResponse ||
+        (cur.filter((k) => lines[k].style !== "response").length < 2 &&
+          !solo(l) &&
+          !solo(prev) &&
+          segOf(l.start) === segOf(lines[cur[0]].start) &&
+          l.start - prev.end < 2.5 &&
+          cur.reduce((n, k) => n + lines[k].text.length, 0) + l.text.length < 90 &&
+          !(prev.style === "response")));
+    if (canJoin) cur.push(i);
+    else groups.push([i]);
+  }
+  const out: Group[] = [];
+  groups.forEach((ids, gi) => {
+    const first = lines[ids[0]];
+    const last = lines[ids[ids.length - 1]];
+    const next = groups[gi + 1] ? lines[groups[gi + 1][0]] : undefined;
+    const prevEnd = out.length ? out[out.length - 1].end : -Infinity;
+    // wait for the previous couplet to finish leaving, but never start after the first word
+    const start = Math.min(first.start - 0.12, Math.max(first.start - 0.35, prevEnd + EXIT));
+    const hold = last.style === "punchline" || last.style === "spoken" ? 1.8 : 1.2;
+    const end = Math.min(last.end + hold, next ? next.start - 0.45 : Infinity);
+    out.push({ ids, start, end: Math.max(end, last.end - 0.2) });
+  });
+  return out;
+};
+
+/* ---------- word colouring ---------- */
+const Glyphs: React.FC<{ w: Word; t: number; paper: boolean; mono: boolean }> = ({ w, t, paper, mono }) => {
+  const unsung = paper ? "#a7a4aa" : "#5f5c63";
+  const done = paper ? C.paperInk : C.white;
+  const dur = Math.max(0.1, w.e - w.s);
+  const p = (t - w.s) / dur;
+  const accent = isAccent(w.t);
+  if (p < 0) return <span style={{ color: unsung }}>{w.t}</span>;
+  if (p >= 1) {
+    const col = accent ? C.pink : done;
+    return (
+      <span style={{ color: col, textShadow: paper ? undefined : accent ? `0 0 22px rgba(255,46,138,0.55)` : `0 0 18px rgba(255,255,255,0.22)` }}>{w.t}</span>
+    );
+  }
+  // active: letters fill pink left → right
+  const n = w.t.length;
+  const filled = Math.ceil(clamp01(p * 1.15) * n);
+  return (
+    <span style={{ display: "inline-block", transform: `translateY(${-6 * Math.sin(Math.PI * clamp01(p))}px)`, textShadow: paper ? undefined : `0 0 24px rgba(255,46,138,0.7)` }}>
+      <span style={{ color: C.pink }}>{w.t.slice(0, filled)}</span>
+      <span style={{ color: mono ? unsung : unsung }}>{w.t.slice(filled)}</span>
+    </span>
+  );
+};
+
+/* ---------- layouts ---------- */
+const fitSize = (layout: LyricLayout, texts: string[]) => {
+  const longest = Math.max(...texts.map((s) => s.length));
+  const cw = layout.kind === "log" ? 0.6 : 0.56;
+  // allow wrapping into up to 3 rows per lyric line if it is very long
+  let best = 0;
+  for (const rows of [1, 2, 3]) {
+    const s = Math.min(layout.size, (layout.w * rows) / (longest * cw * (rows === 1 ? 1 : 1.12)));
+    best = s;
+    if (s >= layout.size * 0.72) break;
+  }
+  return best;
+};
+
+const BlockGroup: React.FC<{ g: Group; layout: LyricLayout; t: number }> = ({ g, layout, t }) => {
+  const paper = !!layout.paper;
+  const mono = layout.kind === "log";
+  const size = fitSize(layout, g.ids.map((i) => (mono ? "# " : "") + lines[i].text));
+  let wordIndex = 0;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: layout.x,
+        top: layout.y,
+        width: layout.w,
+        transform: layout.angle ? `rotate(${layout.angle}deg)` : undefined,
+        transformOrigin: "0 0",
+        textAlign: layout.align ?? "left",
+        fontFamily: mono ? F.mono : F.sans,
+        fontWeight: mono ? 400 : 800,
+        fontSize: size,
+        letterSpacing: mono ? 0 : "-0.025em",
+        lineHeight: mono ? 1.45 : 1.06,
+      }}
+    >
+      {g.ids.map((li) => {
+        const l = lines[li];
+        const response = l.style === "response";
+        return (
+          <div key={l.id} style={{ marginBottom: mono ? 0 : size * 0.06, paddingLeft: response && !mono ? size * 0.6 : 0 }}>
+            {mono && <span style={{ color: response ? C.pink : paper ? "#a7a4aa" : "#5f5c63" }}>{response ? "→ " : "# "}</span>}
+            {!mono && response && <span style={{ color: C.pink }}>→ </span>}
+            {l.words.map((w, wi) => {
+              const k = wordIndex++;
+              const a = ease((t - g.start - k * 0.02) / 0.22);
+              return (
+                <span key={wi} style={{ display: "inline-block", opacity: a, transform: `translateY(${(1 - a) * 28}px)`, marginRight: "0.24em", whiteSpace: "nowrap" }}>
+                  <Glyphs w={w} t={t} paper={paper} mono={mono} />
+                </span>
+              );
+            })}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+/** Text that rides an SVG path (one lyric line). */
+const PathGroup: React.FC<{ g: Group; layout: LyricLayout; t: number }> = ({ g, layout, t }) => {
+  const l = lines[g.ids[0]];
+  const id = `lp${l.id}`;
+  const chars: { ch: string; color: string; dy: number; op: number }[] = [];
+  let k = 0;
+  l.words.forEach((w, wi) => {
+    const dur = Math.max(0.1, w.e - w.s);
+    const p = (t - w.s) / dur;
+    const accent = isAccent(w.t);
+    const txt = w.t + (wi < l.words.length - 1 ? " " : "");
+    for (let c = 0; c < txt.length; c++) {
+      const filled = p >= 1 || (p >= 0 && c < Math.ceil(clamp01(p * 1.15) * w.t.length));
+      const color = p >= 1 ? (accent ? C.pink : C.white) : filled ? C.pink : "#5f5c63";
+      const a = ease((t - g.start - k * 0.012) / 0.3);
+      chars.push({ ch: txt[c], color, dy: (1 - a) * 30, op: a });
+      k++;
+    }
+  });
+  return (
+    <svg width={1920} height={1080} style={{ position: "absolute", left: 0, top: 0, overflow: "visible" }}>
+      <defs>
+        <path id={id} d={layout.path} />
+      </defs>
+      <text fontFamily={F.sans} fontWeight={800} fontSize={layout.size} letterSpacing={-1} style={{ filter: "drop-shadow(0 0 14px rgba(255,255,255,0.18))" }}>
+        <textPath href={`#${id}`} startOffset={layout.align === "center" ? "50%" : "0%"} textAnchor={layout.align === "center" ? "middle" : "start"}>
+          {chars.map((c, i) => (
+            <tspan key={i} fill={c.color} opacity={c.op}>
+              {c.ch}
+            </tspan>
+          ))}
+        </textPath>
+      </text>
+    </svg>
+  );
+};
+
+/** Hook: each word lands huge, one after another. */
+const SlamGroup: React.FC<{ g: Group; layout: LyricLayout; t: number }> = ({ g, layout, t }) => {
+  const l = lines[g.ids[0]];
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: layout.x,
+        top: layout.y,
+        width: layout.w,
+        textAlign: "center",
+        fontFamily: F.sans,
+        fontWeight: 800,
+        fontSize: layout.size,
+        lineHeight: 0.95,
+        letterSpacing: "-0.04em",
+        textTransform: "uppercase",
+      }}
+    >
+      {l.words.map((w, i) => {
+        const dt = t - w.s;
+        const k = ease(dt / 0.18);
+        const active = dt >= 0 && dt < Math.max(0.15, w.e - w.s);
+        return (
+          <span
+            key={i}
+            style={{
+              display: "inline-block",
+              marginRight: "0.18em",
+              opacity: dt < -0.02 ? 0 : 1,
+              transform: `scale(${dt < 0 ? 1.6 : 1.6 - 0.6 * k})`,
+              color: active ? C.pink : isAccent(w.t) ? C.pink : C.white,
+              textShadow: active ? `0 0 40px rgba(255,46,138,0.9)` : `0 0 24px rgba(255,255,255,0.25)`,
+            }}
+          >
+            {w.t}
+          </span>
+        );
+      })}
+    </div>
+  );
+};
+
+export const LyricLayer: React.FC<{ groups: Group[]; layoutOf: (g: Group) => LyricLayout }> = ({ groups, layoutOf }) => {
+  const f = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const t = f / fps;
+  const visible = groups.filter((g) => t >= g.start && t <= g.end + EXIT);
+  return (
+    <AbsoluteFill style={{ pointerEvents: "none" }}>
+      {visible.slice(-2).map((g) => {
+        const layout = layoutOf(g);
+        const out = clamp01((t - g.end) / EXIT);
+        const Comp = layout.kind === "path" ? PathGroup : layout.kind === "slam" ? SlamGroup : BlockGroup;
+        return (
+          <AbsoluteFill key={g.ids[0]} style={{ opacity: 1 - out, filter: out > 0 ? `blur(${out * 10}px)` : undefined, transform: `translateY(${-out * 30}px)` }}>
+            <Comp g={g} layout={layout} t={t} />
+          </AbsoluteFill>
+        );
+      })}
+    </AbsoluteFill>
+  );
+};
