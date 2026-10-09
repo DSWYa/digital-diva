@@ -1,6 +1,6 @@
 import React, { createContext, useContext } from "react";
 import { AbsoluteFill, random, useCurrentFrame } from "remotion";
-import { C, F, H, W } from "../theme";
+import { accentA, C, F, H, hiA, W } from "../theme";
 
 /* ---------- math helpers ---------- */
 export const clamp01 = (x: number) => Math.max(0, Math.min(1, x));
@@ -60,34 +60,103 @@ export const Canvas: React.FC<{ children: React.ReactNode; style?: React.CSSProp
   </svg>
 );
 
+/* ---------- per-scene style (background pattern + GUI insets) ---------- */
+export type BgKind = "grid" | "dots" | "blueprint" | "scan" | "iso" | "rings" | "hatch" | "aurora";
+export type SceneStyle = { bg: BgKind; inset: { top: number; left: number; bottom: number } };
+export const StyleCtx = createContext<SceneStyle>({ bg: "grid", inset: { top: 0, left: 0, bottom: 0 } });
+export const useSceneStyle = () => useContext(StyleCtx);
+
 /* ---------- backgrounds ---------- */
-export const Dark: React.FC<{ glow?: number }> = ({ glow = 0 }) => (
-  <AbsoluteFill style={{ background: `radial-gradient(ellipse 80% 70% at 50% 45%, ${C.bg2} 0%, ${C.bg} 70%)` }}>
-    {glow > 0 && <AbsoluteFill style={{ background: `radial-gradient(circle at 50% 50%, rgba(255,46,138,${0.12 * glow}) 0%, transparent 55%)` }} />}
-  </AbsoluteFill>
-);
+export const Dark: React.FC<{ glow?: number }> = ({ glow = 0 }) => {
+  const f = useCurrentFrame();
+  const { bg } = useSceneStyle();
+  const drift = f / 30;
+  return (
+    <AbsoluteFill style={{ background: `radial-gradient(ellipse 80% 70% at 50% 45%, ${C.bg2} 0%, ${C.bg} 70%)` }}>
+      {/* slow coloured light leaks so each palette reads as its own space */}
+      <AbsoluteFill
+        style={{
+          background: `radial-gradient(circle at ${50 + Math.sin(drift * 0.11) * 35}% ${30 + Math.cos(drift * 0.08) * 25}%, ${accentA(bg === "aurora" ? 0.22 : 0.07)} 0%, transparent ${bg === "aurora" ? 45 : 38}%), radial-gradient(circle at ${50 - Math.sin(drift * 0.07) * 40}% ${75 + Math.sin(drift * 0.1) * 15}%, ${hiA(bg === "aurora" ? 0.08 : 0.03)} 0%, transparent 40%)`,
+        }}
+      />
+      {glow > 0 && <AbsoluteFill style={{ background: `radial-gradient(circle at 50% 50%, ${accentA(0.12 * glow)} 0%, transparent 55%)` }} />}
+    </AbsoluteFill>
+  );
+};
 
 export const Paper: React.FC = () => (
   <AbsoluteFill style={{ background: C.paper }}>
     <Canvas>
       {new Array(140).fill(0).map((_, i) => (
-        <circle key={i} cx={random(`pp${i}`) * W} cy={random(`pq${i}`) * H} r={0.8 + random(`pr${i}`) * 1.2} fill="#9c999f" opacity={0.5} />
+        <circle key={i} cx={random(`pp${i}`) * W} cy={random(`pq${i}`) * H} r={0.8 + random(`pr${i}`) * 1.2} fill={C.paperDim} opacity={0.5} />
       ))}
     </Canvas>
   </AbsoluteFill>
 );
 
-export const Grid: React.FC<{ size?: number; color?: string; opacity?: number; major?: number }> = ({ size = 48, color = "#2c2a30", opacity = 0.7, major = 0 }) => {
-  const id = `g${size}${major}`;
+/** Background pattern; the scene's style decides which (grid, dots, blueprint, scanlines…). */
+export const Grid: React.FC<{ size?: number; color?: string; opacity?: number; major?: number }> = ({ size = 48, color = C.gridLine, opacity = 0.7, major = 0 }) => {
+  const f = useCurrentFrame();
+  const { bg } = useSceneStyle();
+  const id = `g${bg}${size}${major}`;
+  if (bg === "scan") {
+    const band = (f * 6) % (H + 300) - 150;
+    return (
+      <AbsoluteFill style={{ opacity }}>
+        <AbsoluteFill style={{ background: `repeating-linear-gradient(0deg, ${color} 0px, ${color} 1px, transparent 1px, transparent 5px)`, opacity: 0.8 }} />
+        <div style={{ position: "absolute", left: 0, right: 0, top: band, height: 140, background: `linear-gradient(180deg, transparent, ${hiA(0.05)}, transparent)` }} />
+        <AbsoluteFill style={{ boxShadow: `inset 0 0 220px rgba(0,0,0,0.75)`, borderRadius: 40 }} />
+      </AbsoluteFill>
+    );
+  }
+  if (bg === "aurora") return null;
+  let pattern: React.ReactNode;
+  const w = size;
+  let h = size;
+  switch (bg) {
+    case "dots":
+      pattern = <circle cx={size / 2} cy={size / 2} r={1.6} fill={color} />;
+      break;
+    case "iso":
+      h = size * 0.577 * 2;
+      pattern = <path d={`M 0 0 L ${size} ${h / 2} M ${size} 0 L 0 ${h / 2} M 0 ${h / 2} L ${size} ${h} M ${size} ${h / 2} L 0 ${h}`} stroke={color} strokeWidth={1} fill="none" />;
+      break;
+    case "hatch":
+      pattern = <path d={`M 0 ${size} L ${size} 0`} stroke={color} strokeWidth={1} fill="none" />;
+      break;
+    default:
+      pattern = <path d={`M ${size} 0 L 0 0 0 ${size}`} fill="none" stroke={color} strokeWidth={1} />;
+  }
   return (
     <AbsoluteFill style={{ opacity }}>
       <svg width={W} height={H}>
         <defs>
-          <pattern id={id} width={size} height={size} patternUnits="userSpaceOnUse">
-            <path d={`M ${size} 0 L 0 0 0 ${size}`} fill="none" stroke={color} strokeWidth={1} />
+          <pattern id={id} width={w} height={h} patternUnits="userSpaceOnUse">
+            {pattern}
           </pattern>
         </defs>
         <rect width={W} height={H} fill={`url(#${id})`} />
+        {bg === "rings" &&
+          new Array(14).fill(0).map((_, i) => <circle key={i} cx={W / 2} cy={H / 2} r={80 + i * 90} fill="none" stroke={color} strokeWidth={i % 4 === 0 ? 2 : 1} />)}
+        {bg === "rings" &&
+          new Array(12).fill(0).map((_, i) => (
+            <line key={`s${i}`} x1={W / 2} y1={H / 2} x2={W / 2 + Math.cos((i / 12) * Math.PI * 2) * 1400} y2={H / 2 + Math.sin((i / 12) * Math.PI * 2) * 1400} stroke={color} strokeWidth={1} />
+          ))}
+        {bg === "blueprint" && (
+          <g>
+            {new Array(Math.ceil(W / (size * 5)) + 1).fill(0).map((_, i) => (
+              <line key={`v${i}`} x1={i * size * 5} y1={0} x2={i * size * 5} y2={H} stroke={color} strokeWidth={2} />
+            ))}
+            {new Array(Math.ceil(H / (size * 5)) + 1).fill(0).map((_, i) => (
+              <line key={`h${i}`} x1={0} y1={i * size * 5} x2={W} y2={i * size * 5} stroke={color} strokeWidth={2} />
+            ))}
+            {new Array(Math.ceil(W / (size * 5)) + 1).fill(0).map((_, i) =>
+              new Array(Math.ceil(H / (size * 5)) + 1).fill(0).map((__, j) => (
+                <path key={`c${i}${j}`} d={`M ${i * size * 5 - 8} ${j * size * 5} h 16 M ${i * size * 5} ${j * size * 5 - 8} v 16`} stroke={C.dim} strokeWidth={1.5} />
+              )),
+            )}
+          </g>
+        )}
         {major > 0 &&
           new Array(Math.ceil(W / (size * major))).fill(0).map((_, i) => (
             <line key={i} x1={i * size * major} y1={0} x2={i * size * major} y2={H} stroke={color} strokeWidth={2} />
@@ -98,7 +167,7 @@ export const Grid: React.FC<{ size?: number; color?: string; opacity?: number; m
 };
 
 /** Wireframe perspective floor. */
-export const Floor: React.FC<{ horizon?: number; color?: string; speed?: number; opacity?: number }> = ({ horizon = 640, color = "#4a474e", speed = 0, opacity = 0.8 }) => {
+export const Floor: React.FC<{ horizon?: number; color?: string; speed?: number; opacity?: number }> = ({ horizon = 640, color = C.dim, speed = 0, opacity = 0.55 }) => {
   const f = useCurrentFrame();
   const vx = W / 2;
   const items: React.ReactNode[] = [];
@@ -183,6 +252,7 @@ export const Hud: React.FC<{ tl?: string; tr?: string; bl?: string; br?: string;
   color = C.dim,
   accent,
 }) => {
+  const { inset } = useSceneStyle();
   const st = (k: string): React.CSSProperties => ({
     position: "absolute",
     fontFamily: F.mono,
@@ -195,10 +265,10 @@ export const Hud: React.FC<{ tl?: string; tr?: string; bl?: string; br?: string;
   });
   return (
     <AbsoluteFill style={{ pointerEvents: "none" }}>
-      {tl && <div style={{ ...st("tl"), left: 80, top: 36 }}>{tl}</div>}
-      {tr && <div style={{ ...st("tr"), right: 80, top: 36 }}>{tr}</div>}
-      {bl && <div style={{ ...st("bl"), left: 80, bottom: 36 }}>{bl}</div>}
-      {br && <div style={{ ...st("br"), right: 80, bottom: 36 }}>{br}</div>}
+      {tl && <div style={{ ...st("tl"), left: 80 + inset.left, top: 36 + inset.top }}>{tl}</div>}
+      {tr && <div style={{ ...st("tr"), right: 80, top: 36 + inset.top }}>{tr}</div>}
+      {bl && <div style={{ ...st("bl"), left: 80 + inset.left, bottom: 36 + inset.bottom }}>{bl}</div>}
+      {br && <div style={{ ...st("br"), right: 80, bottom: 36 + inset.bottom }}>{br}</div>}
     </AbsoluteFill>
   );
 };
@@ -264,7 +334,7 @@ export const Pixel: React.FC<{ x: number; y: number; size?: number; pulse?: numb
         width: size,
         height: size,
         background: "#fff",
-        boxShadow: `0 0 ${size * 0.6}px ${C.pink}, 0 0 ${size * 2.2 * g}px ${C.pink}, 0 0 ${size * 5 * g}px rgba(255,46,138,0.45)`,
+        boxShadow: `0 0 ${size * 0.6}px ${C.pink}, 0 0 ${size * 2.2 * g}px ${C.pink}, 0 0 ${size * 5 * g}px ${accentA(0.45)}`,
         border: `3px solid ${C.pinkSoft}`,
       }}
     />

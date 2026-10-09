@@ -35,7 +35,7 @@ export const Chorus: React.FC<SceneProps> = ({ seg, t }) => {
         <Dark glow={pulse * 0.5 + burst} />
       </Layer>
       <Layer depth={0.3}>
-        <Floor horizon={620} speed={0.12} color={burst > 0.2 || pulse > 0.75 ? C.pink : "#4a474e"} />
+        <Floor horizon={620} speed={0.12} color={burst > 0.2 || pulse > 0.75 ? C.pink : C.dim} />
         <Canvas>
           <line x1={0} y1={620} x2={W} y2={620} stroke={C.pink} strokeWidth={2 + pulse * 4} opacity={0.25 + pulse * 0.75} style={{ filter: `drop-shadow(0 0 ${12 * pulse}px ${C.pink})` }} />
         </Canvas>
@@ -228,7 +228,7 @@ export const QA: React.FC<SceneProps> = ({ seg, t, lt }) => {
         <Paper />
       </Layer>
       <Layer depth={0.4}>
-        <Hud tl="requests.log" tr="playback × 1" color="#8d8a90" />
+        <Hud tl="requests.log" tr="playback × 1" color={C.paperDim} />
         {rows.map(([id, req, res], i) => {
           const age = t - ((lineById[id]?.start ?? 1e9) - 0.3);
           return <LogRow key={id} y={520 + i * 70} ts={res} text={req} age={age - 0.6} hot={i === rows.length - 1 || res.startsWith("410")} size={28} />;
@@ -241,7 +241,7 @@ export const QA: React.FC<SceneProps> = ({ seg, t, lt }) => {
               const a = ease((it.age - i * 0.12) / 0.2);
               return <rect key={i} x={1320 + Math.sin(i * 1.7) * 10} y={700 - i * 34 - (1 - a) * 40} width={360} height={26} fill="none" stroke={C.paperInk} strokeWidth={1.5} opacity={a} />;
             })}
-          {name === "thesis" && <Note x={1500} y={760} anchor="middle" size={20} color="#6b2a4a">pages: {Math.min(10, Math.floor(it.age * 8))} / 10</Note>}
+          {name === "thesis" && <Note x={1500} y={760} anchor="middle" size={20} color={C.pink}>pages: {Math.min(10, Math.floor(it.age * 8))} / 10</Note>}
           {name === "sneeze" && (
             <g>
               <Ink d="M 1300 520 C 1300 420 1420 400 1440 470 C 1460 480 1470 500 1460 520 C 1440 560 1300 600 1300 520 Z" color={C.paperInk} p={ease(it.age / 0.5)} />
@@ -250,7 +250,7 @@ export const QA: React.FC<SceneProps> = ({ seg, t, lt }) => {
                 const a = -0.5 + random(`sa${i}`) * 1;
                 return <circle key={i} cx={1470 + Math.cos(a) * q * 360} cy={510 + Math.sin(a) * q * 260} r={2 + random(`sr${i}`) * 3} fill={C.pink} opacity={1 - q} />;
               })}
-              <Note x={1300} y={640} size={20} color="#6b2a4a">velocity: 160 km/h</Note>
+              <Note x={1300} y={640} size={20} color={C.pink}>velocity: 160 km/h</Note>
             </g>
           )}
           {name === "ex" && (
@@ -279,7 +279,7 @@ export const CatScene: React.FC<SceneProps> = ({ t, lt }) => {
         <Paper />
       </Layer>
       <Layer depth={0.4}>
-        <Hud tl="terminal — tty1" tr={granted ? "access granted" : "auth: pending"} color="#8d8a90" accent={granted ? "tr" : undefined} />
+        <Hud tl="terminal — tty1" tr={granted ? "access granted" : "auth: pending"} color={C.paperDim} accent={granted ? "tr" : undefined} />
         <div style={{ position: "absolute", left: 80, top: 520, fontFamily: F.mono, fontSize: 30, color: C.paperInk, lineHeight: 1.6, whiteSpace: "pre" }}>
           {cmds.slice(0, Math.floor(lt * 3) + 1).join("\n")}
           {granted && <div style={{ color: C.pink, fontWeight: 600 }}>{"ACCESS GRANTED  (purr-fect)"}</div>}

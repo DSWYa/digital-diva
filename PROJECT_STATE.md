@@ -15,7 +15,10 @@ Animated kinetic lyric video (Remotion 4, React/TS), 1920×1080 @ 30 fps, full t
   The glowing pink pixel stands in for the AI.
 - `src/lyrics/Lyrics.tsx` — karaoke couplets: unsung grey → letters fill pink as sung → white (key nouns stay pink).
   Layouts: block, log (mono, paper), path (text rides an SVG curve), slam (hooks).
-- `src/components/hud.tsx` — camera/parallax, grids, self-drawing strokes, dimension lines, anchors, HUD labels.
+- Per-scene look (scene-plan.json): `palette` (neon, cyan, amber, blueprint, violet, lime, alert, paperPink/Blue/Green — CSS variables in `src/theme.ts`),
+  `bg` pattern (grid, dots, blueprint, scan, iso, rings, hatch, aurora) and `gui` chrome (editor, window, terminal, dashboard, player) with an animated cursor.
+- `src/components/hud.tsx` — camera/parallax, background patterns, self-drawing strokes, dimension lines, anchors, HUD labels.
+- `src/components/gui.tsx` — interface chrome: title bars/tabs, rulers, toolbar, status bar, telemetry widget, media player, cursor.
 - `src/components/art.tsx` — monoline drawings (Grandma, cat, cow, couple, duck, phone, computer, printer, toaster…).
 - `src/scenes/` — 21 scene components; `src/DigitalDiva.tsx` — assembly, wipe/glitch/flash transitions, audio.
 

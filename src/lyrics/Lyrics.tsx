@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useRef } from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
-import { C, F } from "../theme";
+import { accentA, C, F, hiA } from "../theme";
 import { Line, lines, Word } from "../lib/timing";
 import { clamp01, ease } from "../components/hud";
 
@@ -24,7 +24,7 @@ const isAccent = (w: string) => ACCENT.test(w.replace(/[^A-Za-z'-]/g, ""));
 
 /* ---------- grouping: lines appear in couplets ---------- */
 export type Group = { ids: number[]; start: number; end: number };
-export const EXIT = 0.22;
+export const EXIT = 0.18;
 
 export const buildGroups = (segOf: (t: number) => number): Group[] => {
   const groups: number[][] = [];
@@ -67,7 +67,7 @@ export const buildGroups = (segOf: (t: number) => number): Group[] => {
 
 /* ---------- word colouring ---------- */
 const Glyphs: React.FC<{ w: Word; t: number; paper: boolean; mono: boolean }> = ({ w, t, paper, mono }) => {
-  const unsung = paper ? "#a7a4aa" : "#5f5c63";
+  const unsung = paper ? C.paperDim : C.unsung;
   const done = paper ? C.paperInk : C.white;
   const dur = Math.max(0.1, w.e - w.s);
   const p = (t - w.s) / dur;
@@ -76,14 +76,14 @@ const Glyphs: React.FC<{ w: Word; t: number; paper: boolean; mono: boolean }> = 
   if (p >= 1) {
     const col = accent ? C.pink : done;
     return (
-      <span style={{ color: col, textShadow: paper ? undefined : accent ? `0 0 22px rgba(255,46,138,0.55)` : `0 0 18px rgba(255,255,255,0.22)` }}>{w.t}</span>
+      <span style={{ color: col, textShadow: paper ? undefined : accent ? `0 0 22px ${accentA(0.55)}` : `0 0 18px ${hiA(0.22)}` }}>{w.t}</span>
     );
   }
   // active: letters fill pink left → right
   const n = w.t.length;
   const filled = Math.ceil(clamp01(p * 1.15) * n);
   return (
-    <span style={{ display: "inline-block", transform: `translateY(${-6 * Math.sin(Math.PI * clamp01(p))}px)`, textShadow: paper ? undefined : `0 0 24px rgba(255,46,138,0.7)` }}>
+    <span style={{ display: "inline-block", transform: `translateY(${-6 * Math.sin(Math.PI * clamp01(p))}px)`, textShadow: paper ? undefined : `0 0 24px ${accentA(0.7)}` }}>
       <span style={{ color: C.pink }}>{w.t.slice(0, filled)}</span>
       <span style={{ color: mono ? unsung : unsung }}>{w.t.slice(filled)}</span>
     </span>
@@ -142,7 +142,7 @@ const BlockGroup: React.FC<{ g: Group; layout: LyricLayout; t: number }> = ({ g,
               fontSize: response ? "1.25em" : undefined,
             }}
           >
-            {mono && <span style={{ color: response ? C.pink : paper ? "#a7a4aa" : "#5f5c63" }}>{response ? "→ " : "# "}</span>}
+            {mono && <span style={{ color: response ? C.pink : paper ? C.paperDim : C.unsung }}>{response ? "→ " : "# "}</span>}
             {!mono && response && <span style={{ color: C.pink }}>→ </span>}
             {l.words.map((w, wi) => {
               const k = wordIndex++;
@@ -173,7 +173,7 @@ const PathGroup: React.FC<{ g: Group; layout: LyricLayout; t: number }> = ({ g, 
     const txt = w.t + (wi < l.words.length - 1 ? " " : "");
     for (let c = 0; c < txt.length; c++) {
       const filled = p >= 1 || (p >= 0 && c < Math.ceil(clamp01(p * 1.15) * w.t.length));
-      const color = p >= 1 ? (accent ? C.pink : C.white) : filled ? C.pink : "#5f5c63";
+      const color = p >= 1 ? (accent ? C.pink : C.white) : filled ? C.pink : C.unsung;
       const a = ease((t - g.start - k * 0.012) / 0.3);
       chars.push({ ch: txt[c], color, dy: (1 - a) * 30, op: a });
       k++;
@@ -184,7 +184,7 @@ const PathGroup: React.FC<{ g: Group; layout: LyricLayout; t: number }> = ({ g, 
       <defs>
         <path id={id} d={layout.path} />
       </defs>
-      <text fontFamily={F.sans} fontWeight={800} fontSize={layout.size} letterSpacing={-1} style={{ filter: "drop-shadow(0 0 14px rgba(255,255,255,0.18))" }}>
+      <text fontFamily={F.sans} fontWeight={800} fontSize={layout.size} letterSpacing={-1} style={{ filter: `drop-shadow(0 0 14px ${hiA(0.18)})` }}>
         <textPath href={`#${id}`} startOffset={layout.align === "center" ? "50%" : "0%"} textAnchor={layout.align === "center" ? "middle" : "start"}>
           {chars.map((c, i) => (
             <tspan key={i} fill={c.color} opacity={c.op}>
@@ -231,7 +231,7 @@ const SlamGroup: React.FC<{ g: Group; layout: LyricLayout; t: number }> = ({ g, 
               transform: `scale(${dt < 0 ? 0.75 : 0.75 + 0.25 * k})`,
               transformOrigin: "50% 70%",
               color: active ? C.pink : isAccent(w.t) ? C.pink : C.white,
-              textShadow: active ? `0 0 40px rgba(255,46,138,0.9)` : `0 0 24px rgba(255,255,255,0.25)`,
+              textShadow: active ? `0 0 40px ${accentA(0.9)}` : `0 0 24px ${hiA(0.25)}`,
             }}
           >
             {w.t}
@@ -242,7 +242,7 @@ const SlamGroup: React.FC<{ g: Group; layout: LyricLayout; t: number }> = ({ g, 
   );
 };
 
-export const LyricLayer: React.FC<{ groups: Group[]; layoutOf: (g: Group) => LyricLayout; qa?: boolean }> = ({ groups, layoutOf, qa }) => {
+export const LyricLayer: React.FC<{ groups: Group[]; layoutOf: (g: Group) => LyricLayout; styleOf?: (g: Group) => React.CSSProperties; qa?: boolean }> = ({ groups, layoutOf, styleOf, qa }) => {
   const f = useCurrentFrame();
   const ref = useRef<HTMLDivElement>(null);
   // QA mode: log the on-screen bounds of every lyric glyph run (read by scripts/qa/bounds.sh)
@@ -267,12 +267,14 @@ export const LyricLayer: React.FC<{ groups: Group[]; layoutOf: (g: Group) => Lyr
   const visible = groups.filter((g) => t >= g.start && t <= g.end + EXIT);
   return (
     <AbsoluteFill ref={ref} style={{ pointerEvents: "none" }}>
-      {visible.slice(-2).map((g) => {
+      {visible.slice(-2).map((g, k, shown) => {
         const layout = layoutOf(g);
-        const out = clamp01((t - g.end) / EXIT);
+        // an incoming couplet pushes the previous one up and out (teleprompter-style)
+        const push = k === 0 && shown.length === 2 ? ease((t - shown[1].start) / 0.2) : 0;
+        const out = Math.max(clamp01((t - g.end) / EXIT), push);
         const Comp = layout.kind === "path" ? PathGroup : layout.kind === "slam" ? SlamGroup : BlockGroup;
         return (
-          <AbsoluteFill key={g.ids[0]} style={{ opacity: 1 - out, filter: out > 0 ? `blur(${out * 10}px)` : undefined, transform: `translateY(${-out * 30}px)` }}>
+          <AbsoluteFill key={g.ids[0]} style={{ ...styleOf?.(g), opacity: (1 - out) * (1 - out), filter: out > 0 ? `blur(${out * 16}px)` : undefined, transform: `translateY(${-out * 60}px)` }}>
             <Comp g={g} layout={layout} t={t} />
           </AbsoluteFill>
         );

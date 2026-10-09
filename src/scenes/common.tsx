@@ -1,5 +1,5 @@
 import React from "react";
-import { C, F } from "../theme";
+import { accentA, C, F } from "../theme";
 import { Segment } from "../lib/plan";
 import { analysis, singing } from "../lib/timing";
 import { clamp01, ease } from "../components/hud";
@@ -69,8 +69,8 @@ export const LogRow: React.FC<{ y: number; ts: string; text: string; age: number
   if (age < 0) return null;
   return (
     <div style={{ position: "absolute", left: x, top: y, fontFamily: F.mono, fontSize: size, opacity: a, transform: `translateX(${(1 - a) * -20}px)`, whiteSpace: "pre", color: paper ? C.paperInk : C.line }}>
-      <span style={{ color: hot ? C.pink : paper ? "#6b2a4a" : C.pinkSoft, borderBottom: `3px solid ${C.pink}`, paddingBottom: 2 }}>{ts}</span>
-      <span style={{ color: paper ? "#5b5a5e" : C.dim }}>{"  " + text}</span>
+      <span style={{ color: hot ? C.pink : paper ? C.pink : C.pinkSoft, borderBottom: `3px solid ${C.pink}`, paddingBottom: 2 }}>{ts}</span>
+      <span style={{ color: paper ? C.paperDim : C.dim }}>{"  " + text}</span>
     </div>
   );
 };
@@ -101,9 +101,9 @@ export const Tag: React.FC<{ x: number; y: number; children: React.ReactNode; ho
         padding: `${size * 0.3}px ${size * 0.6}px`,
         border: `1.5px solid ${hot ? C.pink : paper ? C.paperInk : C.line}`,
         color: hot ? C.pink : paper ? C.paperInk : C.line,
-        background: hot ? "rgba(255,46,138,0.08)" : "transparent",
+        background: hot ? accentA(0.08) : "transparent",
         whiteSpace: "nowrap",
-        boxShadow: hot ? `0 0 18px rgba(255,46,138,0.35)` : undefined,
+        boxShadow: hot ? `0 0 18px ${accentA(0.35)}` : undefined,
       }}
     >
       {children}

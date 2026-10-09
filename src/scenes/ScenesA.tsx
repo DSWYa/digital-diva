@@ -1,6 +1,6 @@
 import React from "react";
 import { AbsoluteFill, random } from "remotion";
-import { C, F, W } from "../theme";
+import { accentA, C, F, hiA, W } from "../theme";
 import { beatAt, beatPulse, hitPulse, lineById, wordTime } from "../lib/timing";
 import { currentItem } from "../lib/plan";
 import {
@@ -83,13 +83,13 @@ export const Title: React.FC<SceneProps> = ({ seg, t, lt }) => {
         <Hud
           tl={finale ? "end of transmission" : "track 01 — digital diva"}
           tr={`${Math.round(1000 * 128.8) / 1000} bpm · bar ${bar} · beat ${(b.n % 4) + 1}`}
-          bl={finale ? "lines sung 90 · words 515 · questions answered ∞" : "(beep boop baby)"}
+          bl={finale ? "lines sung 90 · words 515 · questions answered ∞" : "now playing"}
           br="swing 66%"
           accent="tr"
         />
       </Layer>
       <Layer depth={1}>
-        <div style={{ position: "absolute", left: 0, width: W, top: 250, textAlign: "center", fontFamily: F.sans, fontWeight: 800, fontSize: 230, letterSpacing: "-0.05em", color: C.white, lineHeight: 0.9, textShadow: "0 0 40px rgba(255,255,255,0.18)" }}>
+        <div style={{ position: "absolute", left: 0, width: W, top: 250, textAlign: "center", fontFamily: F.sans, fontWeight: 800, fontSize: 230, letterSpacing: "-0.05em", color: C.white, lineHeight: 0.9, textShadow: `0 0 40px ${hiA(0.18)}` }}>
           {"DIGITAL DIVA".split("").map((ch, i) => {
             const k = ease((lt - i * 0.06) / 0.4);
             return (
@@ -147,7 +147,7 @@ export const Inbox: React.FC<SceneProps> = ({ seg, t, lt }) => {
         <Paper />
       </Layer>
       <Layer depth={0.4}>
-        <Hud tl="inbox.log" tr={name === "newmsg" ? "unread 1" : `priority × 2`} color="#8d8a90" accent={name === "newmsg" ? "tr" : undefined} />
+        <Hud tl="inbox.log" tr={name === "newmsg" ? "unread 1" : `priority × 2`} color={C.paperDim} accent={name === "newmsg" ? "tr" : undefined} />
         {rows.map(([ts, text, hot], i) => (
           <LogRow key={ts + text} y={500 + i * 64} ts={ts} text={text} hot={hot} age={i === rows.length - 1 ? it.age - 0.3 : 1} />
         ))}
@@ -172,7 +172,7 @@ export const Inbox: React.FC<SceneProps> = ({ seg, t, lt }) => {
           {name === "chair" && <Grandma x={1270} y={250} s={0.62} p={ease(it.age / 1.2)} t={t} color={C.paperInk} mood="confused" />}
           {name === "chair" && (
             <g>
-              <Note x={1700} y={820} size={20} color="#6b2a4a">electric: yes</Note>
+              <Note x={1700} y={820} size={20} color={C.pink}>electric: yes</Note>
               <Note x={1700} y={850} size={20} color={C.pink} weight={600}>on switch: ???</Note>
             </g>
           )}
@@ -187,7 +187,7 @@ export const Inbox: React.FC<SceneProps> = ({ seg, t, lt }) => {
                   <div key={k} style={{ marginBottom: 14 }}>
                     <span style={{ color: C.pink }}>¶{k + 1}</span>
                     {new Array(4).fill(0).map((__, r) => (
-                      <div key={r} style={{ height: 8, margin: "7px 0", width: `${90 - ((r * 17 + k * 7) % 35)}%`, background: "#9c999f" }} />
+                      <div key={r} style={{ height: 8, margin: "7px 0", width: `${90 - ((r * 17 + k * 7) % 35)}%`, background: C.paperDim }} />
                     ))}
                   </div>
                 ))}
@@ -275,7 +275,7 @@ export const Filter: React.FC<SceneProps> = ({ seg, t, lt }) => {
           )}
         </Canvas>
         {name === "make" && (
-          <div style={{ position: "absolute", left: 1040, top: 680, width: 780, height: 110, border: `1.5px solid ${C.line}`, fontFamily: F.mono, fontSize: 40, color: C.line, padding: "26px 28px", boxShadow: `0 0 30px rgba(255,46,138,${0.2 + 0.2 * beatPulse(t)})` }}>
+          <div style={{ position: "absolute", left: 1040, top: 680, width: 780, height: 110, border: `1.5px solid ${C.line}`, fontFamily: F.mono, fontSize: 40, color: C.line, padding: "26px 28px", boxShadow: `0 0 30px ${accentA(0.2 + 0.2 * beatPulse(t))}` }}>
             {"> make: "}
             <span style={{ color: C.pink }}>{Math.floor(t * 2.5) % 2 ? "█" : " "}</span>
           </div>

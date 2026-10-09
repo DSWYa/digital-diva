@@ -1,6 +1,8 @@
 import planJson from "../data/scene-plan.json";
 import { buildGroups, Group, LyricLayout } from "../lyrics/Lyrics";
 import { analysis, lineById, lines } from "./timing";
+import type { BgKind } from "../components/hud";
+import type { GuiKind } from "../components/gui";
 
 export type Transition = "cut" | "wipe" | "glitch" | "flash" | "fade";
 type RawSegment = {
@@ -10,8 +12,16 @@ type RawSegment = {
   items?: Record<string, string>;
   variant?: string;
   transition?: Transition;
+  palette?: string;
+  bg?: BgKind;
+  gui?: GuiKind;
+  title?: string;
+  widget?: string;
+  cursor?: [number, number] | null;
 };
 export type Segment = Omit<RawSegment, "lyric"> & {
+  bg: BgKind;
+  gui: GuiKind;
   index: number;
   start: number;
   end: number;
@@ -55,6 +65,8 @@ export const segments: Segment[] = raw.map((s, i) => ({
   items: s.items ?? {},
   // eslint-disable-next-line @remotion/non-pure-animation -- scene transition type, not CSS
   transition: s.transition ?? "cut",
+  bg: s.bg ?? "grid",
+  gui: s.gui ?? "none",
 }));
 
 export const segmentIndexAt = (t: number) => {
@@ -70,6 +82,8 @@ export const layoutOfGroup = (g: Group): LyricLayout => {
   if (first.style === "hook") return SLAM;
   return segments[segmentIndexAt(first.start)].lyric;
 };
+
+export const paletteOfGroup = (g: Group) => segments[segmentIndexAt(lines[g.ids[0]].start)].palette;
 
 /** The most recent per-line item of a segment that has started by time t. */
 export const currentItem = (seg: Segment, t: number) => {

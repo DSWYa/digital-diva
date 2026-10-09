@@ -219,7 +219,7 @@ export const Cat: React.FC<Art & { typing?: boolean; paper?: boolean }> = ({ p =
         <path key={o} d={body} transform={`translate(${-o * 0.4} ${o * 0.2})`} fill="none" stroke={ink} strokeWidth={1.5} opacity={(0.25 + i * 0.15) * p} />
       ))}
       <path d={tailD} fill="none" stroke={ink} strokeWidth={10} strokeLinecap="round" opacity={p} />
-      <path d={body} fill={paper ? "#1b1a1d" : "#050506"} stroke={ink} strokeWidth={2} opacity={p} />
+      <path d={body} fill={paper ? "#1b1a1d" : "#040405"} stroke={ink} strokeWidth={2} opacity={p} />
       <path d={`M 120 ${330 - paw} l 40 0 M 250 ${330 - paw2} l 40 0`} stroke={ink} strokeWidth={14} strokeLinecap="round" opacity={p} />
       <circle cx={232} cy={118} r={7} fill={C.pink} opacity={p} style={{ filter: `drop-shadow(0 0 6px ${C.pink})` }} />
       <circle cx={282} cy={118} r={7} fill={C.pink} opacity={p} style={{ filter: `drop-shadow(0 0 6px ${C.pink})` }} />

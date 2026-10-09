@@ -29,7 +29,9 @@ groups.forEach((g) => {
       const idx = k++;
       for (const t of [w.s, (w.s + w.e) / 2]) {
         const shown = visibleAt(t).includes(g);
-        const out = Math.max(0, Math.min(1, (t - g.end) / EXIT));
+        const vis = visibleAt(t);
+        const push = vis.length === 2 && vis[0] === g ? ease((t - vis[1].start) / 0.2) : 0;
+        const out = Math.max(Math.max(0, Math.min(1, (t - g.end) / EXIT)), push);
         const alpha = ease((t - g.start - idx * 0.02) / 0.22) * (1 - out);
         if (!shown || alpha < 0.85) {
           wordFails++;

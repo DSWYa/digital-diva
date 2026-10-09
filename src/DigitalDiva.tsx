@@ -1,12 +1,13 @@
 import React from "react";
 import { AbsoluteFill, Img, random, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { Audio } from "@remotion/media";
-import { C, H, W } from "./theme";
+import { C, H, paletteVars, W } from "./theme";
 import { ensureFonts } from "./fonts";
-import { groups, layoutOfGroup, segments, Segment } from "./lib/plan";
+import { currentItem, groups, layoutOfGroup, paletteOfGroup, segments, Segment } from "./lib/plan";
 import { hitPulse } from "./lib/timing";
 import { LyricLayer } from "./lyrics/Lyrics";
-import { ease } from "./components/hud";
+import { ease, StyleCtx } from "./components/hud";
+import { Chrome, GUI_INSETS } from "./components/gui";
 import { SceneProps } from "./scenes/common";
 import { Filter, Inbox, Notify, Queue, Session, Specimen, Title } from "./scenes/ScenesA";
 import { Bridge, CatScene, Chorus, ComeOn, Drop, ErrorScene, GlassesScene, Kitchen, LaptopScene, Montage, Neural, QA, Shutdown, Solo } from "./scenes/ScenesB";
@@ -33,6 +34,55 @@ const SCENES: Record<string, React.FC<SceneProps>> = {
   glasses: GlassesScene,
   shutdown: Shutdown,
   comeon: ComeOn,
+};
+
+const TITLES: Record<string, string> = {
+  session: "session.log",
+  title: "now playing",
+  inbox: "inbox — mail",
+  filter: "pipeline.fig",
+  queue: "queue.db",
+  notify: "notifications",
+  chorus: "chorus.live",
+  solo: "solo.wav",
+  qa: "requests.log",
+  cat: "tty1",
+  kitchen: "recipe.json",
+  neural: "self.model",
+  laptop: "activity monitor",
+  bridge: "capabilities.md",
+  error: "diva.exe",
+  drop: "visualizer",
+  montage: "can_do.test",
+  glasses: "search.app",
+};
+
+/** Scene + its palette, background style and interface chrome. */
+const StyledScene: React.FC<{ seg: Segment; t: number }> = ({ seg, t }) => {
+  const Comp = SCENES[seg.scene];
+  const lt = t - seg.start;
+  const items = Object.keys(seg.items).length;
+  const it = currentItem(seg, t);
+  const idx = it.name ? Object.values(seg.items).indexOf(it.name) : 0;
+  const paper = (seg.palette ?? "").startsWith("paper");
+  return (
+    <AbsoluteFill style={paletteVars(seg.palette)}>
+      <StyleCtx.Provider value={{ bg: seg.bg, inset: GUI_INSETS[seg.gui] }}>
+        <Comp seg={seg} t={t} lt={lt} />
+        <Chrome
+          kind={seg.gui}
+          t={t}
+          lt={lt}
+          title={seg.title ?? (seg.scene === "specimen" ? `${seg.variant}.svg` : TITLES[seg.scene] ?? seg.scene)}
+          paper={paper}
+          widget={seg.widget}
+          cursor={seg.cursor}
+          itemAge={items && it.name ? it.age : 99}
+          itemIndex={idx}
+        />
+      </StyleCtx.Provider>
+    </AbsoluteFill>
+  );
 };
 
 const TR: Record<Segment["transition"], number> = { wipe: 0.4, glitch: 0.25, fade: 0.6, flash: 0, cut: 0 };
@@ -78,15 +128,13 @@ const SceneStack: React.FC<{ t: number }> = ({ t }) => {
   });
   return (
     <>
-      {active.map((seg) => {
-        const Comp = SCENES[seg.scene];
-        if (!Comp) return null;
-        return (
+      {active.map((seg) =>
+        SCENES[seg.scene] ? (
           <TransitionMask key={seg.index} seg={seg} t={t}>
-            <Comp seg={seg} t={t} lt={t - seg.start} />
+            <StyledScene seg={seg} t={t} />
           </TransitionMask>
-        );
-      })}
+        ) : null,
+      )}
       {active
         .filter((s) => s.transition === "flash" && t - s.start < 0.3)
         .map((s) => (
@@ -105,10 +153,10 @@ export const DigitalDiva: React.FC<DigitalDivaProps> = ({ showTimingDebug, qa = 
   const t = frame / fps;
   const hit = hitPulse(t);
   return (
-    <AbsoluteFill style={{ backgroundColor: C.bg, overflow: "hidden" }}>
+    <AbsoluteFill style={{ ...paletteVars("neon"), backgroundColor: C.bg, overflow: "hidden" }}>
       <Audio src={staticFile("audio/digital-diva.mp3")} />
       <SceneStack t={t} />
-      <LyricLayer groups={groups} layoutOf={layoutOfGroup} qa={qa} />
+      <LyricLayer groups={groups} layoutOf={layoutOfGroup} styleOf={(g) => paletteVars(paletteOfGroup(g))} qa={qa} />
       <AbsoluteFill style={{ background: `radial-gradient(ellipse at 50% 120%, ${C.pink} 0%, transparent 50%)`, opacity: hit * 0.1, mixBlendMode: "screen", pointerEvents: "none" }} />
       <AbsoluteFill style={{ background: "radial-gradient(ellipse 80% 75% at 50% 50%, transparent 60%, rgba(0,0,0,0.45) 100%)", pointerEvents: "none" }} />
       <Img src={staticFile("noise.png")} style={{ position: "absolute", left: -((frame * 137) % 512), top: -((frame * 71) % 512), width: W + 1024, height: H + 1024, objectFit: "none", opacity: 0.045, mixBlendMode: "overlay", pointerEvents: "none" }} />
