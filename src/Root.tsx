@@ -1,6 +1,6 @@
 import React from "react";
 import { Composition } from "remotion";
-import { DigitalDiva, DigitalDivaProps } from "./DigitalDiva";
+import { DigitalDiva } from "./DigitalDiva";
 import { analysis } from "./lib/timing";
 
 const FPS = 30;
@@ -13,6 +13,6 @@ export const RemotionRoot: React.FC = () => (
     fps={FPS}
     width={1920}
     height={1080}
-    defaultProps={{ showTimingDebug: false } satisfies DigitalDivaProps}
+    defaultProps={{ showTimingDebug: false }}
   />
 );
