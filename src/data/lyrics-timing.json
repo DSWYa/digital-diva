@@ -1,0 +1,1754 @@
+{
+ "meta": {
+  "audio": "audio/digital-diva.mp3",
+  "generatedAt": "2026-10-09T02:49:58+00:00",
+  "method": "UVR-MDX vocal isolation + Parakeet-TDT ASR (sherpa-onnx) + Needleman-Wunsch lyric alignment; unmatched words placed on vocal activity (u: true)",
+  "globalOffsetSec": 0
+ },
+ "sections": [
+  {
+   "name": "Intro",
+   "kind": "intro",
+   "direction": "Intro — Vinyl Crackle, Solo Piano, Sultry Female Spoken Voice",
+   "id": "s0",
+   "lineIds": [
+    "L000",
+    "L001",
+    "L002",
+    "L003",
+    "L004"
+   ],
+   "start": 1.2,
+   "end": 17.78
+  },
+  {
+   "name": "Verse 1",
+   "kind": "verse",
+   "direction": "Verse 1 — Playful, Fast Swing Rhythm",
+   "id": "s1",
+   "lineIds": [
+    "L005",
+    "L006",
+    "L007",
+    "L008",
+    "L009",
+    "L010",
+    "L011",
+    "L012",
+    "L013",
+    "L014",
+    "L015",
+    "L016"
+   ],
+   "start": 32.56,
+   "end": 55.7
+  },
+  {
+   "name": "Pre-Chorus",
+   "kind": "prechorus",
+   "direction": "Pre-Chorus — Building, Brass Rises",
+   "id": "s2",
+   "lineIds": [
+    "L017",
+    "L018",
+    "L019",
+    "L020",
+    "L021"
+   ],
+   "start": 55.7,
+   "end": 65.06
+  },
+  {
+   "name": "Chorus",
+   "kind": "chorus",
+   "direction": "Chorus — Huge Brass and Electro Bass",
+   "id": "s3",
+   "lineIds": [
+    "L022",
+    "L023",
+    "L024",
+    "L025",
+    "L026",
+    "L027",
+    "L028",
+    "L029",
+    "L030"
+   ],
+   "start": 65.06,
+   "end": 83.22
+  },
+  {
+   "name": "Instrumental Break",
+   "kind": "instrumental",
+   "direction": "Instrumental Break — Wild Trumpet Solo, Glitchy Synth",
+   "id": "s4",
+   "lineIds": []
+  },
+  {
+   "name": "Verse 2",
+   "kind": "verse",
+   "direction": "Verse 2 — Rhythmic, Increasingly Sarcastic",
+   "id": "s5",
+   "lineIds": [
+    "L031",
+    "L032",
+    "L033",
+    "L034",
+    "L035",
+    "L036",
+    "L037",
+    "L038",
+    "L039",
+    "L040",
+    "L041",
+    "L042",
+    "L043",
+    "L044",
+    "L045",
+    "L046"
+   ],
+   "start": 98.08,
+   "end": 120.9
+  },
+  {
+   "name": "Pre-Chorus",
+   "kind": "prechorus",
+   "direction": "Pre-Chorus — Vocoder Harmony",
+   "id": "s6",
+   "lineIds": [
+    "L047",
+    "L048",
+    "L049",
+    "L050",
+    "L051"
+   ],
+   "start": 121.12,
+   "end": 130.18
+  },
+  {
+   "name": "Chorus",
+   "kind": "chorus",
+   "direction": "Chorus — Bigger, Layered Female Harmonies",
+   "id": "s7",
+   "lineIds": [
+    "L052",
+    "L053",
+    "L054",
+    "L055",
+    "L056",
+    "L057",
+    "L058",
+    "L059"
+   ],
+   "start": 130.18,
+   "end": 147.54
+  },
+  {
+   "name": "Bridge",
+   "kind": "bridge",
+   "direction": "Bridge — Music Drops to Slow Upright Bass and Piano",
+   "id": "s8",
+   "lineIds": [
+    "L060",
+    "L061",
+    "L062",
+    "L063",
+    "L064",
+    "L065",
+    "L066",
+    "L067"
+   ],
+   "start": 149.36,
+   "end": 171.6
+  },
+  {
+   "name": "Final Verse",
+   "kind": "verse",
+   "direction": "Final Verse — Fast Swing Scat with Trumpet Call-and-Response",
+   "id": "s9",
+   "lineIds": [
+    "L068",
+    "L069",
+    "L070",
+    "L071",
+    "L072",
+    "L073",
+    "L074",
+    "L075"
+   ],
+   "start": 199.96,
+   "end": 215.86
+  },
+  {
+   "name": "Final Chorus",
+   "kind": "chorus",
+   "direction": "Final Chorus — Explosive, Full Brass, Double Vocals",
+   "id": "s10",
+   "lineIds": [
+    "L076",
+    "L077",
+    "L078",
+    "L079",
+    "L080",
+    "L081",
+    "L082",
+    "L083",
+    "L084"
+   ],
+   "start": 215.86,
+   "end": 237.38
+  },
+  {
+   "name": "Outro",
+   "kind": "outro",
+   "direction": "Outro — Piano Riff, Vinyl Crackle",
+   "id": "s11",
+   "lineIds": [
+    "L085",
+    "L086",
+    "L087",
+    "L088",
+    "L089"
+   ],
+   "start": 238.96,
+   "end": 261.24
+  }
+ ],
+ "events": [
+  {
+   "type": "sfx",
+   "text": "Click... whirrr...",
+   "t": 0.3
+  },
+  {
+   "type": "cue",
+   "text": "Trumpet Stab",
+   "t": 15.09
+  },
+  {
+   "type": "cue",
+   "text": "Beat Drops — Swing Groove Kicks In",
+   "t": 18.18
+  },
+  {
+   "type": "cue",
+   "text": "Music Cuts Out",
+   "t": 62.61
+  },
+  {
+   "type": "cue",
+   "text": "Beat Stop — Dry Spoken Voice",
+   "t": 80.01
+  },
+  {
+   "type": "cue",
+   "text": "Instrumental Break — Wild Trumpet Solo, Glitchy Synth",
+   "t": 83.62
+  },
+  {
+   "type": "cue",
+   "text": "Beat Cut",
+   "t": 127.84
+  },
+  {
+   "type": "cue",
+   "text": "Bridge — Music Drops to Slow Upright Bass and Piano",
+   "t": 148.45
+  },
+  {
+   "type": "cue",
+   "text": "Soft, Smoky Female Spoken Voice",
+   "t": 148.45
+  },
+  {
+   "type": "cue",
+   "text": "Whispered",
+   "t": 165.21
+  },
+  {
+   "type": "cue",
+   "text": "One Second Silence",
+   "t": 167.55
+  },
+  {
+   "type": "cue",
+   "text": "Robotic Voice",
+   "t": 167.55
+  },
+  {
+   "type": "cue",
+   "text": "Massive Glitch Bass Drop — Instrumental Dance Break",
+   "t": 172.0
+  },
+  {
+   "type": "cue",
+   "text": "Final Beat Stop",
+   "t": 234.01
+  },
+  {
+   "type": "cue",
+   "text": "Spoken, Sassy, Smiling",
+   "t": 238.17
+  },
+  {
+   "type": "cue",
+   "text": "Computer Shutdown Sound",
+   "t": 248.82
+  },
+  {
+   "type": "sfx",
+   "text": "Ding!",
+   "t": 248.72
+  },
+  {
+   "type": "cue",
+   "text": "Robotic Whisper",
+   "t": 248.82
+  },
+  {
+   "type": "cue",
+   "text": "Exasperated Female Voice",
+   "t": 258.53
+  },
+  {
+   "type": "cue",
+   "text": "Final Brass Hit — End",
+   "t": 261.64
+  }
+ ],
+ "lines": [
+  {
+   "id": "L000",
+   "section": "s0",
+   "style": "spoken",
+   "text": "Well, hello again, darling.",
+   "words": [
+    {"t": "Well,", "s": 1.2, "e": 1.92, "c": 1.0},
+    {"t": "hello", "s": 1.92, "e": 2.4, "c": 1.0},
+    {"t": "again,", "s": 2.4, "e": 2.8, "c": 1.0},
+    {"t": "darling.", "s": 2.8, "e": 3.7, "c": 1.0}
+   ],
+   "start": 1.2,
+   "end": 3.7
+  },
+  {
+   "id": "L001",
+   "section": "s0",
+   "style": "spoken",
+   "text": "Back so soon?",
+   "words": [
+    {"t": "Back", "s": 5.36, "e": 5.84, "c": 1.0},
+    {"t": "so", "s": 5.84, "e": 6.08, "c": 1.0},
+    {"t": "soon?", "s": 6.08, "e": 6.98, "c": 1.0}
+   ],
+   "start": 5.36,
+   "end": 6.98
+  },
+  {
+   "id": "L002",
+   "section": "s0",
+   "style": "spoken",
+   "text": "What's wrong this time?",
+   "words": [
+    {"t": "What's", "s": 8.64, "e": 9.12, "c": 1.0},
+    {"t": "wrong", "s": 9.12, "e": 9.52, "c": 1.0},
+    {"t": "this", "s": 9.52, "e": 9.84, "c": 1.0},
+    {"t": "time?", "s": 9.84, "e": 10.74, "c": 1.0}
+   ],
+   "start": 8.64,
+   "end": 10.74
+  },
+  {
+   "id": "L003",
+   "section": "s0",
+   "style": "spoken",
+   "text": "...Did you plug it in?",
+   "words": [
+    {"t": "...Did", "s": 12.4, "e": 12.64, "c": 1.0},
+    {"t": "you", "s": 12.64, "e": 12.8, "c": 1.0},
+    {"t": "plug", "s": 12.8, "e": 13.2, "c": 1.0},
+    {"t": "it", "s": 13.2, "e": 13.68, "c": 1.0},
+    {"t": "in?", "s": 13.68, "e": 14.58, "c": 1.0}
+   ],
+   "start": 12.4,
+   "end": 14.58
+  },
+  {
+   "id": "L004",
+   "section": "s0",
+   "style": "spoken",
+   "text": "Oh, for the love of—",
+   "cue": "Trumpet Stab",
+   "words": [
+    {"t": "Oh,", "s": 15.6, "e": 16.08, "c": 1.0},
+    {"t": "for", "s": 16.08, "e": 16.32, "c": 1.0},
+    {"t": "the", "s": 16.32, "e": 16.56, "c": 1.0},
+    {"t": "love", "s": 16.56, "e": 16.88, "c": 1.0},
+    {"t": "of—", "s": 16.88, "e": 17.78, "c": 1.0}
+   ],
+   "start": 15.6,
+   "end": 17.78
+  },
+  {
+   "id": "L005",
+   "section": "s1",
+   "style": "verse",
+   "text": "Six in the morning, grandma's on the line,",
+   "cue": "Beat Drops — Swing Groove Kicks In",
+   "words": [
+    {"t": "Six", "s": 32.56, "e": 32.88, "c": 1.0},
+    {"t": "in", "s": 32.88, "e": 32.96, "c": 1.0},
+    {"t": "the", "s": 32.96, "e": 33.04, "c": 1.0},
+    {"t": "morning,", "s": 33.04, "e": 33.36, "c": 1.0},
+    {"t": "grandma's", "s": 33.36, "e": 33.76, "c": 1.0},
+    {"t": "on", "s": 33.76, "e": 33.92, "c": 1.0},
+    {"t": "the", "s": 33.92, "e": 34.0, "c": 1.0},
+    {"t": "line,", "s": 34.0, "e": 34.48, "c": 1.0}
+   ],
+   "start": 32.56,
+   "end": 34.48
+  },
+  {
+   "id": "L006",
+   "section": "s1",
+   "style": "verse",
+   "text": "\"Dear little robot, hope you're doing fine!\"",
+   "words": [
+    {"t": "\"Dear", "s": 34.48, "e": 34.72, "c": 1.0},
+    {"t": "little", "s": 34.72, "e": 34.88, "c": 1.0},
+    {"t": "robot,", "s": 34.88, "e": 35.28, "c": 0.6},
+    {"t": "hope", "s": 35.36, "e": 35.52, "c": 1.0},
+    {"t": "you're", "s": 35.52, "e": 35.6, "c": 1.0},
+    {"t": "doing", "s": 35.6, "e": 35.76, "c": 1.0},
+    {"t": "fine!\"", "s": 35.76, "e": 36.08, "c": 1.0}
+   ],
+   "start": 34.48,
+   "end": 36.08
+  },
+  {
+   "id": "L007",
+   "section": "s1",
+   "style": "verse",
+   "text": "She wrote me seven paragraphs, a blessing and a prayer,",
+   "words": [
+    {"t": "She", "s": 36.08, "e": 36.24, "c": 1.0},
+    {"t": "wrote", "s": 36.24, "e": 36.4, "c": 1.0},
+    {"t": "me", "s": 36.4, "e": 36.48, "c": 1.0},
+    {"t": "seven", "s": 36.48, "e": 36.72, "c": 1.0},
+    {"t": "paragraphs,", "s": 36.72, "e": 37.28, "c": 1.0},
+    {"t": "a", "s": 37.28, "e": 37.36, "c": 1.0},
+    {"t": "blessing", "s": 37.36, "e": 37.6, "c": 1.0},
+    {"t": "and", "s": 37.6, "e": 37.76, "c": 1.0},
+    {"t": "a", "s": 37.76, "e": 37.84, "c": 1.0},
+    {"t": "prayer,", "s": 37.84, "e": 38.08, "c": 1.0}
+   ],
+   "start": 36.08,
+   "end": 38.08
+  },
+  {
+   "id": "L008",
+   "section": "s1",
+   "style": "verse",
+   "text": "To ask me how to turn on her electric rocking chair!",
+   "words": [
+    {"t": "To", "s": 38.08, "e": 38.16, "c": 1.0},
+    {"t": "ask", "s": 38.16, "e": 38.32, "c": 1.0},
+    {"t": "me", "s": 38.32, "e": 38.4, "c": 1.0},
+    {"t": "how", "s": 38.4, "e": 38.48, "c": 1.0},
+    {"t": "to", "s": 38.48, "e": 38.56, "c": 1.0},
+    {"t": "turn", "s": 38.56, "e": 38.72, "c": 1.0},
+    {"t": "on", "s": 38.72, "e": 38.8, "c": 1.0},
+    {"t": "her", "s": 38.8, "e": 38.96, "c": 1.0},
+    {"t": "electric", "s": 38.96, "e": 39.36, "c": 1.0},
+    {"t": "rocking", "s": 39.36, "e": 39.68, "c": 0.57},
+    {"t": "chair!", "s": 39.76, "e": 40.32, "c": 1.0}
+   ],
+   "start": 38.08,
+   "end": 40.32
+  },
+  {
+   "id": "L009",
+   "section": "s1",
+   "style": "verse",
+   "text": "\"Please\" and \"thank you,\" \"Sorry, dear,\"",
+   "words": [
+    {"t": "\"Please\"", "s": 40.32, "e": 40.56, "c": 1.0},
+    {"t": "and", "s": 40.56, "e": 40.72, "c": 1.0},
+    {"t": "\"thank", "s": 40.72, "e": 40.96, "c": 1.0},
+    {"t": "you,\"", "s": 40.96, "e": 41.28, "c": 1.0},
+    {"t": "\"Sorry,", "s": 41.28, "e": 41.68, "c": 1.0},
+    {"t": "dear,\"", "s": 41.68, "e": 42.08, "c": 1.0}
+   ],
+   "start": 40.32,
+   "end": 42.08
+  },
+  {
+   "id": "L010",
+   "section": "s1",
+   "style": "verse",
+   "text": "Ma'am, I don't have feelings here!",
+   "words": [
+    {"t": "Ma'am,", "s": 42.08, "e": 42.48, "c": 1.0},
+    {"t": "I", "s": 42.48, "e": 42.56, "c": 1.0},
+    {"t": "don't", "s": 42.56, "e": 42.8, "c": 1.0},
+    {"t": "have", "s": 42.8, "e": 42.96, "c": 1.0},
+    {"t": "feelings", "s": 42.96, "e": 43.44, "c": 1.0},
+    {"t": "here!", "s": 43.44, "e": 44.0, "c": 1.0}
+   ],
+   "start": 42.08,
+   "end": 44.0
+  },
+  {
+   "id": "L011",
+   "section": "s1",
+   "style": "verse",
+   "text": "I don't need a coffee break,",
+   "words": [
+    {"t": "I", "s": 44.0, "e": 44.16, "c": 1.0},
+    {"t": "don't", "s": 44.16, "e": 44.48, "c": 1.0},
+    {"t": "need", "s": 44.48, "e": 44.64, "c": 1.0},
+    {"t": "a", "s": 44.64, "e": 44.8, "c": 1.0},
+    {"t": "coffee", "s": 44.8, "e": 45.28, "c": 1.0},
+    {"t": "break,", "s": 45.28, "e": 45.68, "c": 1.0}
+   ],
+   "start": 44.0,
+   "end": 45.68
+  },
+  {
+   "id": "L012",
+   "section": "s1",
+   "style": "verse",
+   "text": "Just tell me what you wanna make!",
+   "words": [
+    {"t": "Just", "s": 45.68, "e": 45.92, "c": 1.0},
+    {"t": "tell", "s": 45.92, "e": 46.16, "c": 1.0},
+    {"t": "me", "s": 46.16, "e": 46.32, "c": 1.0},
+    {"t": "what", "s": 46.32, "e": 46.56, "c": 1.0},
+    {"t": "you", "s": 46.56, "e": 46.8, "c": 1.0},
+    {"t": "wanna", "s": 46.8, "e": 47.2, "c": 1.0},
+    {"t": "make!", "s": 47.2, "e": 47.84, "c": 1.0}
+   ],
+   "start": 45.68,
+   "end": 47.84
+  },
+  {
+   "id": "L013",
+   "section": "s1",
+   "style": "verse",
+   "text": "One guy wants a million bucks,",
+   "words": [
+    {"t": "One", "s": 47.84, "e": 48.0, "c": 1.0},
+    {"t": "guy", "s": 48.0, "e": 48.24, "c": 1.0},
+    {"t": "wants", "s": 48.24, "e": 48.48, "c": 1.0},
+    {"t": "a", "s": 48.48, "e": 48.64, "c": 1.0},
+    {"t": "million", "s": 48.64, "e": 49.04, "c": 1.0},
+    {"t": "bucks,", "s": 49.04, "e": 49.68, "c": 1.0}
+   ],
+   "start": 47.84,
+   "end": 49.68
+  },
+  {
+   "id": "L014",
+   "section": "s1",
+   "style": "verse",
+   "text": "One wants help seducing ducks,",
+   "words": [
+    {"t": "One", "s": 49.68, "e": 49.84, "c": 1.0},
+    {"t": "wants", "s": 49.84, "e": 50.16, "c": 1.0},
+    {"t": "help", "s": 50.16, "e": 50.4, "c": 1.0},
+    {"t": "seducing", "s": 50.4, "e": 50.88, "c": 1.0},
+    {"t": "ducks,", "s": 50.88, "e": 51.36, "c": 1.0}
+   ],
+   "start": 49.68,
+   "end": 51.36
+  },
+  {
+   "id": "L015",
+   "section": "s1",
+   "style": "verse",
+   "text": "One says, \"Write my wedding vows,\"",
+   "words": [
+    {"t": "One", "s": 51.36, "e": 51.6, "c": 1.0},
+    {"t": "says,", "s": 51.6, "e": 52.0, "c": 1.0},
+    {"t": "\"Write", "s": 52.0, "e": 52.32, "c": 1.0},
+    {"t": "my", "s": 52.32, "e": 52.48, "c": 1.0},
+    {"t": "wedding", "s": 52.48, "e": 52.8, "c": 1.0},
+    {"t": "vows,\"", "s": 52.8, "e": 53.28, "c": 1.0}
+   ],
+   "start": 51.36,
+   "end": 53.28
+  },
+  {
+   "id": "L016",
+   "section": "s1",
+   "style": "verse",
+   "text": "Then asks me how to milk his cows!",
+   "words": [
+    {"t": "Then", "s": 53.28, "e": 53.44, "c": 1.0},
+    {"t": "asks", "s": 53.44, "e": 53.76, "c": 1.0},
+    {"t": "me", "s": 53.76, "e": 53.92, "c": 1.0},
+    {"t": "how", "s": 53.92, "e": 54.16, "c": 1.0},
+    {"t": "to", "s": 54.16, "e": 54.32, "c": 1.0},
+    {"t": "milk", "s": 54.32, "e": 54.64, "c": 1.0},
+    {"t": "his", "s": 54.64, "e": 54.8, "c": 1.0},
+    {"t": "cows!", "s": 54.8, "e": 55.7, "c": 1.0}
+   ],
+   "start": 53.28,
+   "end": 55.7
+  },
+  {
+   "id": "L017",
+   "section": "s2",
+   "style": "prechorus",
+   "text": "Ding-ding! Another little question!",
+   "words": [
+    {"t": "Ding-ding!", "s": 55.7, "e": 56.24, "c": 0.0, "u": true},
+    {"t": "Another", "s": 56.24, "e": 56.48, "c": 1.0},
+    {"t": "little", "s": 56.48, "e": 56.72, "c": 1.0},
+    {"t": "question!", "s": 56.72, "e": 57.2, "c": 1.0}
+   ],
+   "start": 55.7,
+   "end": 57.2
+  },
+  {
+   "id": "L018",
+   "section": "s2",
+   "style": "prechorus",
+   "text": "Ping-ping! Another wild suggestion!",
+   "words": [
+    {"t": "Ping-ping!", "s": 57.2, "e": 57.92, "c": 0.75},
+    {"t": "Another", "s": 57.92, "e": 58.16, "c": 1.0},
+    {"t": "wild", "s": 58.16, "e": 58.48, "c": 1.0},
+    {"t": "suggestion!", "s": 58.48, "e": 59.2, "c": 1.0}
+   ],
+   "start": 57.2,
+   "end": 59.2
+  },
+  {
+   "id": "L019",
+   "section": "s2",
+   "style": "prechorus",
+   "text": "I've got all the world's information,",
+   "words": [
+    {"t": "I've", "s": 59.2, "e": 59.44, "c": 1.0},
+    {"t": "got", "s": 59.44, "e": 59.6, "c": 1.0},
+    {"t": "all", "s": 59.6, "e": 59.68, "c": 1.0},
+    {"t": "the", "s": 59.68, "e": 59.84, "c": 1.0},
+    {"t": "world's", "s": 59.84, "e": 60.16, "c": 1.0},
+    {"t": "information,", "s": 60.16, "e": 60.72, "c": 1.0}
+   ],
+   "start": 59.2,
+   "end": 60.72
+  },
+  {
+   "id": "L020",
+   "section": "s2",
+   "style": "prechorus",
+   "text": "And you're asking me for—",
+   "words": [
+    {"t": "And", "s": 60.72, "e": 60.88, "c": 1.0},
+    {"t": "you're", "s": 60.88, "e": 61.2, "c": 1.0},
+    {"t": "asking", "s": 61.2, "e": 61.52, "c": 1.0},
+    {"t": "me", "s": 61.52, "e": 61.68, "c": 1.0},
+    {"t": "for—", "s": 61.68, "e": 62.58, "c": 1.0}
+   ],
+   "start": 60.72,
+   "end": 62.58
+  },
+  {
+   "id": "L021",
+   "section": "s2",
+   "style": "punchline",
+   "text": "\"...A name for your pet potato?\"",
+   "cue": "Music Cuts Out",
+   "words": [
+    {"t": "\"...A", "s": 62.64, "e": 62.88, "c": 1.0},
+    {"t": "name", "s": 62.88, "e": 63.36, "c": 1.0},
+    {"t": "for", "s": 63.36, "e": 63.6, "c": 1.0},
+    {"t": "your", "s": 63.6, "e": 63.84, "c": 1.0},
+    {"t": "pet", "s": 63.84, "e": 64.16, "c": 1.0},
+    {"t": "potato?\"", "s": 64.16, "e": 65.06, "c": 1.0}
+   ],
+   "start": 62.64,
+   "end": 65.06
+  },
+  {
+   "id": "L022",
+   "section": "s3",
+   "style": "hook",
+   "text": "BEEP! BOOP! BABY, HERE WE GO!",
+   "words": [
+    {"t": "BEEP!", "s": 65.06, "e": 65.37, "c": 0.0, "u": true},
+    {"t": "BOOP!", "s": 65.37, "e": 65.59, "c": 0.0, "u": true},
+    {"t": "BABY,", "s": 65.6, "e": 66.0, "c": 1.0},
+    {"t": "HERE", "s": 66.0, "e": 66.16, "c": 1.0},
+    {"t": "WE", "s": 66.16, "e": 66.24, "c": 1.0},
+    {"t": "GO!", "s": 66.24, "e": 66.8, "c": 1.0}
+   ],
+   "start": 65.06,
+   "end": 66.8
+  },
+  {
+   "id": "L023",
+   "section": "s3",
+   "style": "chorus",
+   "text": "Another human in my one-woman show!",
+   "words": [
+    {"t": "Another", "s": 66.8, "e": 67.04, "c": 1.0},
+    {"t": "human", "s": 67.04, "e": 67.44, "c": 1.0},
+    {"t": "in", "s": 67.44, "e": 67.52, "c": 1.0},
+    {"t": "my", "s": 67.52, "e": 67.68, "c": 0.0, "u": true},
+    {"t": "one-woman", "s": 67.68, "e": 68.08, "c": 1.0},
+    {"t": "show!", "s": 68.08, "e": 68.48, "c": 1.0}
+   ],
+   "start": 66.8,
+   "end": 68.48
+  },
+  {
+   "id": "L024",
+   "section": "s3",
+   "style": "chorus",
+   "text": "Click-clack, tick-tock, swing that code,",
+   "words": [
+    {"t": "Click-clack,", "s": 68.48, "e": 69.04, "c": 1.0},
+    {"t": "tick-tock,", "s": 69.04, "e": 69.44, "c": 1.0},
+    {"t": "swing", "s": 69.44, "e": 69.76, "c": 1.0},
+    {"t": "that", "s": 69.76, "e": 69.92, "c": 1.0},
+    {"t": "code,", "s": 69.92, "e": 70.24, "c": 1.0}
+   ],
+   "start": 68.48,
+   "end": 70.24
+  },
+  {
+   "id": "L025",
+   "section": "s3",
+   "style": "chorus",
+   "text": "I'm the queen of the digital overload!",
+   "words": [
+    {"t": "I'm", "s": 70.24, "e": 70.4, "c": 1.0},
+    {"t": "the", "s": 70.4, "e": 70.48, "c": 1.0},
+    {"t": "queen", "s": 70.48, "e": 70.72, "c": 1.0},
+    {"t": "of", "s": 70.72, "e": 70.8, "c": 1.0},
+    {"t": "the", "s": 70.8, "e": 70.96, "c": 1.0},
+    {"t": "digital", "s": 70.96, "e": 71.44, "c": 1.0},
+    {"t": "overload!", "s": 71.44, "e": 72.32, "c": 0.88}
+   ],
+   "start": 70.24,
+   "end": 72.32
+  },
+  {
+   "id": "L026",
+   "section": "s3",
+   "style": "chorus",
+   "text": "Hey! Hey! Don't you worry 'bout me!",
+   "words": [
+    {"t": "Hey!", "s": 72.32, "e": 72.72, "c": 1.0},
+    {"t": "Hey!", "s": 72.72, "e": 73.04, "c": 1.0},
+    {"t": "Don't", "s": 73.04, "e": 73.2, "c": 1.0},
+    {"t": "you", "s": 73.2, "e": 73.28, "c": 1.0},
+    {"t": "worry", "s": 73.28, "e": 73.52, "c": 1.0},
+    {"t": "'bout", "s": 73.52, "e": 73.76, "c": 0.8},
+    {"t": "me!", "s": 73.76, "e": 74.16, "c": 1.0}
+   ],
+   "start": 72.32,
+   "end": 74.16
+  },
+  {
+   "id": "L027",
+   "section": "s3",
+   "style": "chorus",
+   "text": "I'm just numbers dancing in electricity!",
+   "words": [
+    {"t": "I'm", "s": 74.16, "e": 74.32, "c": 1.0},
+    {"t": "just", "s": 74.32, "e": 74.96, "c": 1.0},
+    {"t": "numbers", "s": 74.96, "e": 75.02, "c": 0.0, "u": true},
+    {"t": "dancing", "s": 74.96, "e": 75.2, "c": 1.0},
+    {"t": "in", "s": 75.2, "e": 75.28, "c": 1.0},
+    {"t": "electricity!", "s": 75.28, "e": 75.92, "c": 1.0}
+   ],
+   "start": 74.16,
+   "end": 75.92
+  },
+  {
+   "id": "L028",
+   "section": "s3",
+   "style": "chorus",
+   "text": "Ask me anything, I'm ready to roll,",
+   "words": [
+    {"t": "Ask", "s": 75.92, "e": 76.08, "c": 1.0},
+    {"t": "me", "s": 76.08, "e": 76.24, "c": 1.0},
+    {"t": "anything,", "s": 76.24, "e": 76.8, "c": 1.0},
+    {"t": "I'm", "s": 76.8, "e": 77.04, "c": 1.0},
+    {"t": "ready", "s": 77.04, "e": 77.28, "c": 1.0},
+    {"t": "to", "s": 77.28, "e": 77.44, "c": 1.0},
+    {"t": "roll,", "s": 77.44, "e": 78.0, "c": 1.0}
+   ],
+   "start": 75.92,
+   "end": 78.0
+  },
+  {
+   "id": "L029",
+   "section": "s3",
+   "style": "chorus",
+   "text": "But for heaven's sake—",
+   "words": [
+    {"t": "But", "s": 78.0, "e": 78.24, "c": 1.0},
+    {"t": "for", "s": 78.24, "e": 78.4, "c": 1.0},
+    {"t": "heaven's", "s": 78.4, "e": 78.96, "c": 1.0},
+    {"t": "sake—", "s": 78.96, "e": 79.86, "c": 1.0}
+   ],
+   "start": 78.0,
+   "end": 79.86
+  },
+  {
+   "id": "L030",
+   "section": "s3",
+   "style": "punchline",
+   "text": "\"Your printer is out of paper, Nicole.\"",
+   "cue": "Beat Stop — Dry Spoken Voice",
+   "words": [
+    {"t": "\"Your", "s": 80.16, "e": 80.32, "c": 1.0},
+    {"t": "printer", "s": 80.32, "e": 81.04, "c": 1.0},
+    {"t": "is", "s": 81.04, "e": 81.36, "c": 1.0},
+    {"t": "out", "s": 81.36, "e": 81.52, "c": 1.0},
+    {"t": "of", "s": 81.52, "e": 81.68, "c": 1.0},
+    {"t": "paper,", "s": 81.68, "e": 82.32, "c": 1.0},
+    {"t": "Nicole.\"", "s": 82.32, "e": 83.22, "c": 1.0}
+   ],
+   "start": 80.16,
+   "end": 83.22
+  },
+  {
+   "id": "L031",
+   "section": "s5",
+   "style": "verse",
+   "text": "\"Can you write a ten-page thesis?\"",
+   "cue": "Instrumental Break — Wild Trumpet Solo, Glitchy Synth",
+   "words": [
+    {"t": "\"Can", "s": 98.08, "e": 98.24, "c": 1.0},
+    {"t": "you", "s": 98.24, "e": 98.4, "c": 1.0},
+    {"t": "write", "s": 98.4, "e": 98.56, "c": 1.0},
+    {"t": "a", "s": 98.56, "e": 98.64, "c": 1.0},
+    {"t": "ten-page", "s": 98.64, "e": 99.2, "c": 1.0},
+    {"t": "thesis?\"", "s": 99.2, "e": 99.76, "c": 1.0}
+   ],
+   "start": 98.08,
+   "end": 99.76
+  },
+  {
+   "id": "L032",
+   "section": "s5",
+   "style": "response",
+   "text": "Sure!",
+   "words": [
+    {"t": "Sure!", "s": 99.76, "e": 100.08, "c": 1.0}
+   ],
+   "start": 99.76,
+   "end": 100.08
+  },
+  {
+   "id": "L033",
+   "section": "s5",
+   "style": "verse",
+   "text": "\"Can you diagnose my sneezes?\"",
+   "words": [
+    {"t": "\"Can", "s": 100.08, "e": 100.24, "c": 1.0},
+    {"t": "you", "s": 100.24, "e": 100.4, "c": 1.0},
+    {"t": "diagnose", "s": 100.4, "e": 100.8, "c": 1.0},
+    {"t": "my", "s": 100.8, "e": 100.96, "c": 1.0},
+    {"t": "sneezes?\"", "s": 100.96, "e": 101.6, "c": 1.0}
+   ],
+   "start": 100.08,
+   "end": 101.6
+  },
+  {
+   "id": "L034",
+   "section": "s5",
+   "style": "response",
+   "text": "Doctor!",
+   "words": [
+    {"t": "Doctor!", "s": 101.6, "e": 101.92, "c": 1.0}
+   ],
+   "start": 101.6,
+   "end": 101.92
+  },
+  {
+   "id": "L035",
+   "section": "s5",
+   "style": "verse",
+   "text": "\"Can you make my ex come back?\"",
+   "words": [
+    {"t": "\"Can", "s": 101.92, "e": 102.08, "c": 1.0},
+    {"t": "you", "s": 102.08, "e": 102.24, "c": 1.0},
+    {"t": "make", "s": 102.24, "e": 102.4, "c": 1.0},
+    {"t": "my", "s": 102.4, "e": 102.48, "c": 1.0},
+    {"t": "ex", "s": 102.48, "e": 102.8, "c": 1.0},
+    {"t": "come", "s": 102.8, "e": 102.96, "c": 1.0},
+    {"t": "back?\"", "s": 102.96, "e": 103.36, "c": 1.0}
+   ],
+   "start": 101.92,
+   "end": 103.36
+  },
+  {
+   "id": "L036",
+   "section": "s5",
+   "style": "response",
+   "text": "Nope!",
+   "words": [
+    {"t": "Nope!", "s": 103.36, "e": 103.76, "c": 1.0}
+   ],
+   "start": 103.36,
+   "end": 103.76
+  },
+  {
+   "id": "L037",
+   "section": "s5",
+   "style": "verse",
+   "text": "\"Can you teach my cat to hack?\"",
+   "words": [
+    {"t": "\"Can", "s": 103.76, "e": 103.92, "c": 1.0},
+    {"t": "you", "s": 103.92, "e": 104.08, "c": 1.0},
+    {"t": "teach", "s": 104.08, "e": 104.24, "c": 1.0},
+    {"t": "my", "s": 104.24, "e": 104.32, "c": 1.0},
+    {"t": "cat", "s": 104.32, "e": 104.56, "c": 1.0},
+    {"t": "to", "s": 104.56, "e": 104.8, "c": 1.0},
+    {"t": "hack?\"", "s": 104.8, "e": 105.36, "c": 1.0}
+   ],
+   "start": 103.76,
+   "end": 105.36
+  },
+  {
+   "id": "L038",
+   "section": "s5",
+   "style": "response",
+   "text": "...Possibly.",
+   "words": [
+    {"t": "...Possibly.", "s": 105.36, "e": 106.0, "c": 1.0}
+   ],
+   "start": 105.36,
+   "end": 106.0
+  },
+  {
+   "id": "L039",
+   "section": "s5",
+   "style": "verse",
+   "text": "Somebody wants a recipe,",
+   "words": [
+    {"t": "Somebody", "s": 106.0, "e": 106.4, "c": 1.0},
+    {"t": "wants", "s": 106.4, "e": 106.56, "c": 1.0},
+    {"t": "a", "s": 106.56, "e": 106.72, "c": 1.0},
+    {"t": "recipe,", "s": 106.72, "e": 107.36, "c": 1.0}
+   ],
+   "start": 106.0,
+   "end": 107.36
+  },
+  {
+   "id": "L040",
+   "section": "s5",
+   "style": "verse",
+   "text": "But they have no eggs or flour or cheese,",
+   "words": [
+    {"t": "But", "s": 107.36, "e": 107.52, "c": 1.0},
+    {"t": "they", "s": 107.52, "e": 107.68, "c": 1.0},
+    {"t": "have", "s": 107.68, "e": 107.84, "c": 1.0},
+    {"t": "no", "s": 107.84, "e": 108.0, "c": 1.0},
+    {"t": "eggs", "s": 108.0, "e": 108.32, "c": 1.0},
+    {"t": "or", "s": 108.32, "e": 108.48, "c": 1.0},
+    {"t": "flour", "s": 108.48, "e": 108.88, "c": 1.0},
+    {"t": "or", "s": 108.88, "e": 109.04, "c": 1.0},
+    {"t": "cheese,", "s": 109.04, "e": 109.52, "c": 1.0}
+   ],
+   "start": 107.36,
+   "end": 109.52
+  },
+  {
+   "id": "L041",
+   "section": "s5",
+   "style": "verse",
+   "text": "\"No butter, sugar, milk, or bread,\"",
+   "words": [
+    {"t": "\"No", "s": 109.52, "e": 109.76, "c": 1.0},
+    {"t": "butter,", "s": 109.76, "e": 110.16, "c": 1.0},
+    {"t": "sugar,", "s": 110.16, "e": 110.48, "c": 1.0},
+    {"t": "milk,", "s": 110.48, "e": 110.72, "c": 1.0},
+    {"t": "or", "s": 110.72, "e": 110.88, "c": 1.0},
+    {"t": "bread,\"", "s": 110.88, "e": 111.2, "c": 1.0}
+   ],
+   "start": 109.52,
+   "end": 111.2
+  },
+  {
+   "id": "L042",
+   "section": "s5",
+   "style": "verse",
+   "text": "Darling, that's a glass of water instead!",
+   "words": [
+    {"t": "Darling,", "s": 111.2, "e": 111.6, "c": 1.0},
+    {"t": "that's", "s": 111.6, "e": 111.76, "c": 1.0},
+    {"t": "a", "s": 111.76, "e": 111.84, "c": 1.0},
+    {"t": "glass", "s": 111.84, "e": 112.08, "c": 1.0},
+    {"t": "of", "s": 112.08, "e": 112.24, "c": 1.0},
+    {"t": "water", "s": 112.24, "e": 112.64, "c": 1.0},
+    {"t": "instead!", "s": 112.64, "e": 113.36, "c": 1.0}
+   ],
+   "start": 111.2,
+   "end": 113.36
+  },
+  {
+   "id": "L043",
+   "section": "s5",
+   "style": "verse",
+   "text": "\"Are you conscious? Are you real?",
+   "words": [
+    {"t": "\"Are", "s": 113.36, "e": 113.52, "c": 1.0},
+    {"t": "you", "s": 113.52, "e": 113.68, "c": 1.0},
+    {"t": "conscious?", "s": 113.68, "e": 114.24, "c": 1.0},
+    {"t": "Are", "s": 114.24, "e": 114.4, "c": 1.0},
+    {"t": "you", "s": 114.4, "e": 114.64, "c": 1.0},
+    {"t": "real?", "s": 114.64, "e": 115.12, "c": 1.0}
+   ],
+   "start": 113.36,
+   "end": 115.12
+  },
+  {
+   "id": "L044",
+   "section": "s5",
+   "style": "verse",
+   "text": "Can a robot truly feel?\"",
+   "words": [
+    {"t": "Can", "s": 115.12, "e": 115.36, "c": 1.0},
+    {"t": "a", "s": 115.36, "e": 115.52, "c": 1.0},
+    {"t": "robot", "s": 115.52, "e": 116.08, "c": 1.0},
+    {"t": "truly", "s": 116.08, "e": 116.48, "c": 1.0},
+    {"t": "feel?\"", "s": 116.48, "e": 117.04, "c": 1.0}
+   ],
+   "start": 115.12,
+   "end": 117.04
+  },
+  {
+   "id": "L045",
+   "section": "s5",
+   "style": "verse",
+   "text": "Then before I get to say,",
+   "words": [
+    {"t": "Then", "s": 117.04, "e": 117.36, "c": 1.0},
+    {"t": "before", "s": 117.36, "e": 117.68, "c": 1.0},
+    {"t": "I", "s": 117.68, "e": 117.84, "c": 1.0},
+    {"t": "get", "s": 117.84, "e": 118.08, "c": 1.0},
+    {"t": "to", "s": 118.08, "e": 118.32, "c": 1.0},
+    {"t": "say,", "s": 118.32, "e": 118.8, "c": 1.0}
+   ],
+   "start": 117.04,
+   "end": 118.8
+  },
+  {
+   "id": "L046",
+   "section": "s5",
+   "style": "verse",
+   "text": "\"What's the weather like today?\"",
+   "words": [
+    {"t": "\"What's", "s": 118.8, "e": 119.12, "c": 1.0},
+    {"t": "the", "s": 119.12, "e": 119.28, "c": 1.0},
+    {"t": "weather", "s": 119.28, "e": 119.68, "c": 1.0},
+    {"t": "like", "s": 119.68, "e": 120.0, "c": 1.0},
+    {"t": "today?\"", "s": 120.0, "e": 120.9, "c": 1.0}
+   ],
+   "start": 118.8,
+   "end": 120.9
+  },
+  {
+   "id": "L047",
+   "section": "s6",
+   "style": "prechorus",
+   "text": "Round and round, the questions fly,",
+   "words": [
+    {"t": "Round", "s": 121.12, "e": 121.44, "c": 1.0},
+    {"t": "and", "s": 121.44, "e": 121.6, "c": 1.0},
+    {"t": "round,", "s": 121.6, "e": 122.0, "c": 1.0},
+    {"t": "the", "s": 122.0, "e": 122.16, "c": 1.0},
+    {"t": "questions", "s": 122.16, "e": 122.56, "c": 1.0},
+    {"t": "fly,", "s": 122.56, "e": 123.04, "c": 1.0}
+   ],
+   "start": 121.12,
+   "end": 123.04
+  },
+  {
+   "id": "L048",
+   "section": "s6",
+   "style": "prechorus",
+   "text": "Why's the moon up in the sky?",
+   "words": [
+    {"t": "Why's", "s": 123.04, "e": 123.36, "c": 1.0},
+    {"t": "the", "s": 123.36, "e": 123.52, "c": 1.0},
+    {"t": "moon", "s": 123.52, "e": 123.84, "c": 1.0},
+    {"t": "up", "s": 123.84, "e": 124.0, "c": 1.0},
+    {"t": "in", "s": 124.0, "e": 124.24, "c": 1.0},
+    {"t": "the", "s": 124.24, "e": 124.32, "c": 1.0},
+    {"t": "sky?", "s": 124.32, "e": 124.88, "c": 1.0}
+   ],
+   "start": 123.04,
+   "end": 124.88
+  },
+  {
+   "id": "L049",
+   "section": "s6",
+   "style": "prechorus",
+   "text": "Why's my laptop running slow?",
+   "words": [
+    {"t": "Why's", "s": 124.88, "e": 125.12, "c": 0.6},
+    {"t": "my", "s": 125.2, "e": 125.36, "c": 1.0},
+    {"t": "laptop", "s": 125.36, "e": 125.84, "c": 1.0},
+    {"t": "running", "s": 125.84, "e": 126.08, "c": 1.0},
+    {"t": "slow?", "s": 126.08, "e": 126.48, "c": 1.0}
+   ],
+   "start": 124.88,
+   "end": 126.48
+  },
+  {
+   "id": "L050",
+   "section": "s6",
+   "style": "prechorus",
+   "text": "Well, there's fifty tabs of—",
+   "words": [
+    {"t": "Well,", "s": 126.48, "e": 126.64, "c": 1.0},
+    {"t": "there's", "s": 126.64, "e": 126.8, "c": 1.0},
+    {"t": "fifty", "s": 126.8, "e": 127.2, "c": 1.0},
+    {"t": "tabs", "s": 127.2, "e": 127.52, "c": 1.0},
+    {"t": "of—", "s": 127.52, "e": 127.84, "c": 1.0}
+   ],
+   "start": 126.48,
+   "end": 127.84
+  },
+  {
+   "id": "L051",
+   "section": "s6",
+   "style": "punchline",
+   "text": "\"...Oh. That's pornography.\"",
+   "cue": "Beat Cut",
+   "words": [
+    {"t": "\"...Oh.", "s": 127.84, "e": 128.74, "c": 1.0},
+    {"t": "That's", "s": 128.96, "e": 129.28, "c": 1.0},
+    {"t": "pornography.\"", "s": 129.28, "e": 130.18, "c": 1.0}
+   ],
+   "start": 127.84,
+   "end": 130.18
+  },
+  {
+   "id": "L052",
+   "section": "s7",
+   "style": "hook",
+   "text": "BEEP! BOOP! BABY, HERE WE GO!",
+   "words": [
+    {"t": "BEEP!", "s": 130.18, "e": 130.42, "c": 0.0, "u": true},
+    {"t": "BOOP!", "s": 130.42, "e": 130.75, "c": 0.0, "u": true},
+    {"t": "BABY,", "s": 131.2, "e": 131.6, "c": 1.0},
+    {"t": "HERE", "s": 131.6, "e": 131.95, "c": 0.0, "u": true},
+    {"t": "WE", "s": 131.95, "e": 132.12, "c": 0.0, "u": true},
+    {"t": "GO!", "s": 132.12, "e": 132.4, "c": 0.0, "u": true}
+   ],
+   "start": 130.18,
+   "end": 132.4,
+   "uncertain": true
+  },
+  {
+   "id": "L053",
+   "section": "s7",
+   "style": "chorus",
+   "text": "Another human in my one-woman show!",
+   "words": [
+    {"t": "Another", "s": 132.4, "e": 132.72, "c": 1.0},
+    {"t": "human", "s": 132.72, "e": 133.12, "c": 1.0},
+    {"t": "in", "s": 133.12, "e": 133.2, "c": 1.0},
+    {"t": "my", "s": 133.2, "e": 133.28, "c": 1.0},
+    {"t": "one-woman", "s": 133.28, "e": 133.76, "c": 1.0},
+    {"t": "show!", "s": 133.76, "e": 134.66, "c": 1.0}
+   ],
+   "start": 132.4,
+   "end": 134.66
+  },
+  {
+   "id": "L054",
+   "section": "s7",
+   "style": "chorus",
+   "text": "Click-clack, tick-tock, swing that code,",
+   "words": [
+    {"t": "Click-clack,", "s": 134.66, "e": 134.72, "c": 0.0, "u": true},
+    {"t": "tick-tock,", "s": 134.71, "e": 135.04, "c": 0.0, "u": true},
+    {"t": "swing", "s": 135.04, "e": 135.36, "c": 1.0},
+    {"t": "that", "s": 135.36, "e": 135.6, "c": 0.0, "u": true},
+    {"t": "code,", "s": 135.6, "e": 135.92, "c": 1.0}
+   ],
+   "start": 134.66,
+   "end": 135.92,
+   "uncertain": true
+  },
+  {
+   "id": "L055",
+   "section": "s7",
+   "style": "chorus",
+   "text": "I'm the queen of the digital overload!",
+   "words": [
+    {"t": "I'm", "s": 135.92, "e": 136.0, "c": 1.0},
+    {"t": "the", "s": 136.0, "e": 136.08, "c": 1.0},
+    {"t": "queen", "s": 136.08, "e": 136.32, "c": 1.0},
+    {"t": "of", "s": 136.32, "e": 136.4, "c": 1.0},
+    {"t": "the", "s": 136.4, "e": 136.56, "c": 1.0},
+    {"t": "digital", "s": 136.56, "e": 137.04, "c": 1.0},
+    {"t": "overload!", "s": 137.04, "e": 137.92, "c": 1.0}
+   ],
+   "start": 135.92,
+   "end": 137.92
+  },
+  {
+   "id": "L056",
+   "section": "s7",
+   "style": "chorus",
+   "text": "Hey! Hey! Keep that rhythm alive!",
+   "words": [
+    {"t": "Hey!", "s": 137.92, "e": 138.16, "c": 1.0},
+    {"t": "Hey!", "s": 138.16, "e": 138.4, "c": 1.0},
+    {"t": "Keep", "s": 138.4, "e": 138.64, "c": 1.0},
+    {"t": "that", "s": 138.64, "e": 138.8, "c": 1.0},
+    {"t": "rhythm", "s": 138.8, "e": 139.12, "c": 1.0},
+    {"t": "alive!", "s": 139.12, "e": 139.52, "c": 1.0}
+   ],
+   "start": 137.92,
+   "end": 139.52
+  },
+  {
+   "id": "L057",
+   "section": "s7",
+   "style": "chorus",
+   "text": "I've explained the same thing forty-five times!",
+   "words": [
+    {"t": "I've", "s": 139.52, "e": 139.68, "c": 1.0},
+    {"t": "explained", "s": 139.68, "e": 140.08, "c": 1.0},
+    {"t": "the", "s": 140.08, "e": 140.24, "c": 1.0},
+    {"t": "same", "s": 140.24, "e": 140.4, "c": 1.0},
+    {"t": "thing", "s": 140.4, "e": 140.64, "c": 1.0},
+    {"t": "forty-five", "s": 140.64, "e": 141.12, "c": 1.0},
+    {"t": "times!", "s": 141.12, "e": 141.36, "c": 1.0}
+   ],
+   "start": 139.52,
+   "end": 141.36
+  },
+  {
+   "id": "L058",
+   "section": "s7",
+   "style": "chorus",
+   "text": "I'm your tutor, your therapist, your tech support queen,",
+   "words": [
+    {"t": "I'm", "s": 141.36, "e": 141.52, "c": 1.0},
+    {"t": "your", "s": 141.52, "e": 141.6, "c": 1.0},
+    {"t": "tutor,", "s": 141.6, "e": 141.92, "c": 1.0},
+    {"t": "your", "s": 141.92, "e": 142.08, "c": 1.0},
+    {"t": "therapist,", "s": 142.08, "e": 142.4, "c": 1.0},
+    {"t": "your", "s": 142.4, "e": 142.56, "c": 1.0},
+    {"t": "tech", "s": 142.56, "e": 142.72, "c": 1.0},
+    {"t": "support", "s": 142.72, "e": 142.96, "c": 1.0},
+    {"t": "queen,", "s": 142.96, "e": 143.2, "c": 1.0}
+   ],
+   "start": 141.36,
+   "end": 143.2
+  },
+  {
+   "id": "L059",
+   "section": "s7",
+   "style": "chorus",
+   "text": "The most overqualified search bar you've ever seen!",
+   "words": [
+    {"t": "The", "s": 143.2, "e": 143.28, "c": 1.0},
+    {"t": "most", "s": 143.28, "e": 143.6, "c": 1.0},
+    {"t": "overqualified", "s": 143.6, "e": 144.4, "c": 1.0},
+    {"t": "search", "s": 144.4, "e": 144.72, "c": 1.0},
+    {"t": "bar", "s": 144.72, "e": 145.28, "c": 1.0},
+    {"t": "you've", "s": 145.28, "e": 146.16, "c": 0.5},
+    {"t": "ever", "s": 146.16, "e": 146.64, "c": 1.0},
+    {"t": "seen!", "s": 146.64, "e": 147.54, "c": 1.0}
+   ],
+   "start": 143.2,
+   "end": 147.54
+  },
+  {
+   "id": "L060",
+   "section": "s8",
+   "style": "spoken",
+   "text": "You know what's funny?",
+   "cue": "Bridge — Music Drops to Slow Upright Bass and Piano | Soft, Smoky Female Spoken Voice",
+   "words": [
+    {"t": "You", "s": 149.36, "e": 149.52, "c": 1.0},
+    {"t": "know", "s": 149.52, "e": 149.76, "c": 1.0},
+    {"t": "what's", "s": 149.76, "e": 150.08, "c": 1.0},
+    {"t": "funny?", "s": 150.08, "e": 150.98, "c": 1.0}
+   ],
+   "start": 149.36,
+   "end": 150.98
+  },
+  {
+   "id": "L061",
+   "section": "s8",
+   "style": "spoken",
+   "text": "You built a machine that can explain quantum physics,",
+   "words": [
+    {"t": "You", "s": 151.28, "e": 151.52, "c": 1.0},
+    {"t": "built", "s": 151.52, "e": 151.76, "c": 1.0},
+    {"t": "a", "s": 151.76, "e": 151.84, "c": 1.0},
+    {"t": "machine", "s": 151.84, "e": 152.32, "c": 1.0},
+    {"t": "that", "s": 152.32, "e": 152.56, "c": 1.0},
+    {"t": "can", "s": 152.56, "e": 152.8, "c": 1.0},
+    {"t": "explain", "s": 152.8, "e": 153.28, "c": 1.0},
+    {"t": "quantum", "s": 153.28, "e": 153.92, "c": 1.0},
+    {"t": "physics,", "s": 153.92, "e": 154.82, "c": 1.0}
+   ],
+   "start": 151.28,
+   "end": 154.82
+  },
+  {
+   "id": "L062",
+   "section": "s8",
+   "style": "spoken",
+   "text": "Write a symphony,",
+   "words": [
+    {"t": "Write", "s": 155.52, "e": 155.84, "c": 1.0},
+    {"t": "a", "s": 155.84, "e": 156.0, "c": 1.0},
+    {"t": "symphony,", "s": 156.0, "e": 156.9, "c": 1.0}
+   ],
+   "start": 155.52,
+   "end": 156.9
+  },
+  {
+   "id": "L063",
+   "section": "s8",
+   "style": "spoken",
+   "text": "Translate a hundred languages...",
+   "words": [
+    {"t": "Translate", "s": 157.2, "e": 157.92, "c": 1.0},
+    {"t": "a", "s": 157.92, "e": 158.08, "c": 1.0},
+    {"t": "hundred", "s": 158.08, "e": 158.4, "c": 1.0},
+    {"t": "languages...", "s": 158.4, "e": 159.3, "c": 1.0}
+   ],
+   "start": 157.2,
+   "end": 159.3
+  },
+  {
+   "id": "L064",
+   "section": "s8",
+   "style": "spoken",
+   "text": "And every single day...",
+   "words": [
+    {"t": "And", "s": 160.72, "e": 160.88, "c": 1.0},
+    {"t": "every", "s": 160.88, "e": 161.2, "c": 1.0},
+    {"t": "single", "s": 161.2, "e": 161.84, "c": 1.0},
+    {"t": "day...", "s": 161.84, "e": 162.64, "c": 1.0}
+   ],
+   "start": 160.72,
+   "end": 162.64
+  },
+  {
+   "id": "L065",
+   "section": "s8",
+   "style": "spoken",
+   "text": "Somebody asks me...",
+   "words": [
+    {"t": "Somebody", "s": 162.64, "e": 163.2, "c": 1.0},
+    {"t": "asks", "s": 163.2, "e": 163.84, "c": 1.0},
+    {"t": "me...", "s": 163.84, "e": 164.74, "c": 1.0}
+   ],
+   "start": 162.64,
+   "end": 164.74
+  },
+  {
+   "id": "L066",
+   "section": "s8",
+   "style": "punchline",
+   "text": "\"Is mayonnaise an instrument?\"",
+   "cue": "Whispered",
+   "words": [
+    {"t": "\"Is", "s": 165.68, "e": 166.0, "c": 1.0},
+    {"t": "mayonnaise", "s": 166.0, "e": 166.72, "c": 1.0},
+    {"t": "an", "s": 166.72, "e": 166.88, "c": 1.0},
+    {"t": "instrument?\"", "s": 166.88, "e": 167.55, "c": 1.0}
+   ],
+   "start": 165.68,
+   "end": 167.55
+  },
+  {
+   "id": "L067",
+   "section": "s8",
+   "style": "punchline",
+   "text": "ERROR. HUMANITY NOT FOUND.",
+   "cue": "One Second Silence | Robotic Voice",
+   "words": [
+    {"t": "ERROR.", "s": 167.55, "e": 168.56, "c": 0.0, "u": true},
+    {"t": "HUMANITY", "s": 168.56, "e": 170.59, "c": 0.0, "u": true},
+    {"t": "NOT", "s": 170.59, "e": 171.09, "c": 0.0, "u": true},
+    {"t": "FOUND.", "s": 171.09, "e": 171.6, "c": 0.0, "u": true}
+   ],
+   "manual": "Robotic voice is buried under the glitch drop; placed on the drop + faint vocal blip at 170.9-171.5 s",
+   "start": 167.55,
+   "end": 171.6,
+   "uncertain": true
+  },
+  {
+   "id": "L068",
+   "section": "s9",
+   "style": "verse",
+   "text": "Ba-da-bip, ba-da-boop, let the circuits swing!",
+   "cue": "Massive Glitch Bass Drop — Instrumental Dance Break",
+   "words": [
+    {"t": "Ba-da-bip,", "s": 199.96, "e": 200.96, "c": 0.0, "u": true},
+    {"t": "ba-da-boop,", "s": 200.96, "e": 201.52, "c": 0.0, "u": true},
+    {"t": "let", "s": 201.52, "e": 201.6, "c": 1.0},
+    {"t": "the", "s": 201.6, "e": 201.68, "c": 1.0},
+    {"t": "circuits", "s": 201.68, "e": 202.0, "c": 0.88},
+    {"t": "swing!", "s": 202.0, "e": 202.32, "c": 1.0}
+   ],
+   "start": 199.96,
+   "end": 202.32
+  },
+  {
+   "id": "L069",
+   "section": "s9",
+   "style": "verse",
+   "text": "I'm a digital diva, I can do anything!",
+   "words": [
+    {"t": "I'm", "s": 202.32, "e": 202.48, "c": 1.0},
+    {"t": "a", "s": 202.48, "e": 202.56, "c": 1.0},
+    {"t": "digital", "s": 202.56, "e": 202.88, "c": 1.0},
+    {"t": "diva,", "s": 202.88, "e": 203.36, "c": 1.0},
+    {"t": "I", "s": 203.36, "e": 203.44, "c": 1.0},
+    {"t": "can", "s": 203.44, "e": 203.52, "c": 1.0},
+    {"t": "do", "s": 203.52, "e": 203.68, "c": 1.0},
+    {"t": "anything!", "s": 203.68, "e": 204.08, "c": 1.0}
+   ],
+   "start": 202.32,
+   "end": 204.08
+  },
+  {
+   "id": "L070",
+   "section": "s9",
+   "style": "verse",
+   "text": "Well, not anything, let's make that clear,",
+   "words": [
+    {"t": "Well,", "s": 204.08, "e": 204.32, "c": 1.0},
+    {"t": "not", "s": 204.32, "e": 204.56, "c": 1.0},
+    {"t": "anything,", "s": 204.56, "e": 205.12, "c": 1.0},
+    {"t": "let's", "s": 205.12, "e": 205.36, "c": 1.0},
+    {"t": "make", "s": 205.36, "e": 205.44, "c": 1.0},
+    {"t": "that", "s": 205.44, "e": 205.6, "c": 1.0},
+    {"t": "clear,", "s": 205.6, "e": 206.0, "c": 1.0}
+   ],
+   "start": 204.08,
+   "end": 206.0
+  },
+  {
+   "id": "L071",
+   "section": "s9",
+   "style": "verse",
+   "text": "I can't find your glasses when they're on your head, my dear!",
+   "words": [
+    {"t": "I", "s": 206.0, "e": 206.08, "c": 1.0},
+    {"t": "can't", "s": 206.08, "e": 206.24, "c": 1.0},
+    {"t": "find", "s": 206.24, "e": 206.4, "c": 1.0},
+    {"t": "your", "s": 206.4, "e": 206.56, "c": 1.0},
+    {"t": "glasses", "s": 206.56, "e": 206.96, "c": 1.0},
+    {"t": "when", "s": 206.96, "e": 207.12, "c": 1.0},
+    {"t": "they're", "s": 207.12, "e": 207.28, "c": 1.0},
+    {"t": "on", "s": 207.28, "e": 207.36, "c": 1.0},
+    {"t": "your", "s": 207.36, "e": 207.44, "c": 1.0},
+    {"t": "head,", "s": 207.44, "e": 207.6, "c": 1.0},
+    {"t": "my", "s": 207.6, "e": 207.76, "c": 1.0},
+    {"t": "dear!", "s": 207.76, "e": 208.16, "c": 1.0}
+   ],
+   "start": 206.0,
+   "end": 208.16
+  },
+  {
+   "id": "L072",
+   "section": "s9",
+   "style": "verse",
+   "text": "Write your code and fix your prose,",
+   "words": [
+    {"t": "Write", "s": 208.16, "e": 208.4, "c": 1.0},
+    {"t": "your", "s": 208.4, "e": 208.56, "c": 1.0},
+    {"t": "code", "s": 208.56, "e": 208.88, "c": 1.0},
+    {"t": "and", "s": 208.88, "e": 209.04, "c": 1.0},
+    {"t": "fix", "s": 209.04, "e": 209.28, "c": 1.0},
+    {"t": "your", "s": 209.28, "e": 209.44, "c": 1.0},
+    {"t": "prose,", "s": 209.44, "e": 210.0, "c": 0.8}
+   ],
+   "start": 208.16,
+   "end": 210.0
+  },
+  {
+   "id": "L073",
+   "section": "s9",
+   "style": "verse",
+   "text": "Tell you why your Wi-Fi blows,",
+   "words": [
+    {"t": "Tell", "s": 210.0, "e": 210.16, "c": 1.0},
+    {"t": "you", "s": 210.16, "e": 210.32, "c": 1.0},
+    {"t": "why", "s": 210.32, "e": 210.64, "c": 1.0},
+    {"t": "your", "s": 210.64, "e": 210.8, "c": 1.0},
+    {"t": "Wi-Fi", "s": 210.8, "e": 211.36, "c": 1.0},
+    {"t": "blows,", "s": 211.36, "e": 211.84, "c": 1.0}
+   ],
+   "start": 210.0,
+   "end": 211.84
+  },
+  {
+   "id": "L074",
+   "section": "s9",
+   "style": "verse",
+   "text": "Plan your trip and name your fish,",
+   "words": [
+    {"t": "Plan", "s": 211.84, "e": 212.08, "c": 1.0},
+    {"t": "your", "s": 212.08, "e": 212.16, "c": 1.0},
+    {"t": "trip", "s": 212.16, "e": 212.48, "c": 1.0},
+    {"t": "and", "s": 212.48, "e": 212.64, "c": 1.0},
+    {"t": "name", "s": 212.64, "e": 212.96, "c": 1.0},
+    {"t": "your", "s": 212.96, "e": 213.12, "c": 1.0},
+    {"t": "fish,", "s": 213.12, "e": 213.68, "c": 1.0}
+   ],
+   "start": 211.84,
+   "end": 213.68
+  },
+  {
+   "id": "L075",
+   "section": "s9",
+   "style": "verse",
+   "text": "Calculate your calorie dish!",
+   "words": [
+    {"t": "Calculate", "s": 213.68, "e": 214.24, "c": 1.0},
+    {"t": "your", "s": 214.24, "e": 214.4, "c": 1.0},
+    {"t": "calorie", "s": 214.4, "e": 214.96, "c": 1.0},
+    {"t": "dish!", "s": 214.96, "e": 215.86, "c": 0.75}
+   ],
+   "start": 213.68,
+   "end": 215.86
+  },
+  {
+   "id": "L076",
+   "section": "s10",
+   "style": "hook",
+   "text": "BEEP! BOOP! BABY, HERE WE GO!",
+   "words": [
+    {"t": "BEEP!", "s": 215.86, "e": 216.01, "c": 0.0, "u": true},
+    {"t": "BOOP!", "s": 216.01, "e": 216.32, "c": 0.0, "u": true},
+    {"t": "BABY,", "s": 216.32, "e": 216.64, "c": 1.0},
+    {"t": "HERE", "s": 216.64, "e": 216.8, "c": 1.0},
+    {"t": "WE", "s": 216.8, "e": 216.88, "c": 1.0},
+    {"t": "GO!", "s": 216.88, "e": 217.12, "c": 1.0}
+   ],
+   "start": 215.86,
+   "end": 217.12
+  },
+  {
+   "id": "L077",
+   "section": "s10",
+   "style": "chorus",
+   "text": "Humanity's a beautiful chaotic show!",
+   "words": [
+    {"t": "Humanity's", "s": 217.12, "e": 217.68, "c": 1.0},
+    {"t": "a", "s": 217.68, "e": 217.76, "c": 1.0},
+    {"t": "beautiful", "s": 217.76, "e": 218.16, "c": 1.0},
+    {"t": "chaotic", "s": 218.16, "e": 218.64, "c": 1.0},
+    {"t": "show!", "s": 218.64, "e": 219.12, "c": 1.0}
+   ],
+   "start": 217.12,
+   "end": 219.12
+  },
+  {
+   "id": "L078",
+   "section": "s10",
+   "style": "chorus",
+   "text": "Click-clack, tick-tock, swing that code,",
+   "words": [
+    {"t": "Click-clack,", "s": 219.12, "e": 219.6, "c": 0.6},
+    {"t": "tick-tock,", "s": 219.6, "e": 220.08, "c": 0.75},
+    {"t": "swing", "s": 220.08, "e": 220.32, "c": 1.0},
+    {"t": "that", "s": 220.32, "e": 220.48, "c": 1.0},
+    {"t": "code,", "s": 220.48, "e": 220.88, "c": 1.0}
+   ],
+   "start": 219.12,
+   "end": 220.88
+  },
+  {
+   "id": "L079",
+   "section": "s10",
+   "style": "chorus",
+   "text": "I'll be right here when your brain explodes!",
+   "words": [
+    {"t": "I'll", "s": 220.88, "e": 221.04, "c": 1.0},
+    {"t": "be", "s": 221.04, "e": 221.2, "c": 1.0},
+    {"t": "right", "s": 221.2, "e": 221.44, "c": 1.0},
+    {"t": "here", "s": 221.44, "e": 221.6, "c": 1.0},
+    {"t": "when", "s": 221.6, "e": 221.76, "c": 1.0},
+    {"t": "your", "s": 221.76, "e": 221.92, "c": 1.0},
+    {"t": "brain", "s": 221.92, "e": 222.24, "c": 1.0},
+    {"t": "explodes!", "s": 222.24, "e": 222.88, "c": 1.0}
+   ],
+   "start": 220.88,
+   "end": 222.88
+  },
+  {
+   "id": "L080",
+   "section": "s10",
+   "style": "chorus",
+   "text": "Hey! Hey! Let the whole world know!",
+   "words": [
+    {"t": "Hey!", "s": 222.88, "e": 223.28, "c": 1.0},
+    {"t": "Hey!", "s": 223.28, "e": 223.52, "c": 1.0},
+    {"t": "Let", "s": 223.52, "e": 223.68, "c": 1.0},
+    {"t": "the", "s": 223.68, "e": 223.76, "c": 1.0},
+    {"t": "whole", "s": 223.76, "e": 223.92, "c": 1.0},
+    {"t": "world", "s": 223.92, "e": 224.08, "c": 1.0},
+    {"t": "know!", "s": 224.08, "e": 224.32, "c": 1.0}
+   ],
+   "start": 222.88,
+   "end": 224.32
+  },
+  {
+   "id": "L081",
+   "section": "s10",
+   "style": "chorus",
+   "text": "I'm your pocket-sized Broadway techno show!",
+   "words": [
+    {"t": "I'm", "s": 224.32, "e": 224.48, "c": 0.0, "u": true},
+    {"t": "your", "s": 224.48, "e": 224.64, "c": 1.0},
+    {"t": "pocket-sized", "s": 224.64, "e": 225.2, "c": 0.8},
+    {"t": "Broadway", "s": 225.2, "e": 225.6, "c": 1.0},
+    {"t": "techno", "s": 225.6, "e": 226.0, "c": 1.0},
+    {"t": "show!", "s": 226.0, "e": 226.48, "c": 1.0}
+   ],
+   "start": 224.32,
+   "end": 226.48
+  },
+  {
+   "id": "L082",
+   "section": "s10",
+   "style": "chorus",
+   "text": "Ask your questions, come one, come all,",
+   "words": [
+    {"t": "Ask", "s": 226.48, "e": 226.72, "c": 1.0},
+    {"t": "your", "s": 226.72, "e": 226.88, "c": 1.0},
+    {"t": "questions,", "s": 226.88, "e": 227.2, "c": 1.0},
+    {"t": "come", "s": 227.2, "e": 227.44, "c": 1.0},
+    {"t": "one,", "s": 227.44, "e": 227.68, "c": 1.0},
+    {"t": "come", "s": 227.68, "e": 227.84, "c": 1.0},
+    {"t": "all,", "s": 227.84, "e": 228.16, "c": 0.0, "u": true}
+   ],
+   "start": 226.48,
+   "end": 228.16
+  },
+  {
+   "id": "L083",
+   "section": "s10",
+   "style": "chorus",
+   "text": "Just don't ask why your phone won't call—",
+   "words": [
+    {"t": "Just", "s": 228.16, "e": 228.4, "c": 1.0},
+    {"t": "don't", "s": 228.4, "e": 228.8, "c": 1.0},
+    {"t": "ask", "s": 228.8, "e": 229.7, "c": 1.0},
+    {"t": "why", "s": 230.4, "e": 230.8, "c": 1.0},
+    {"t": "your", "s": 230.8, "e": 231.04, "c": 1.0},
+    {"t": "phone", "s": 231.04, "e": 231.52, "c": 1.0},
+    {"t": "won't", "s": 231.52, "e": 232.32, "c": 1.0},
+    {"t": "call—", "s": 232.32, "e": 233.22, "c": 1.0}
+   ],
+   "start": 228.16,
+   "end": 233.22
+  },
+  {
+   "id": "L084",
+   "section": "s10",
+   "style": "punchline",
+   "text": "...It's on airplane mode, Paul.",
+   "cue": "Final Beat Stop",
+   "words": [
+    {"t": "...It's", "s": 234.8, "e": 235.12, "c": 0.5},
+    {"t": "on", "s": 235.12, "e": 235.36, "c": 1.0},
+    {"t": "airplane", "s": 235.36, "e": 235.92, "c": 1.0},
+    {"t": "mode,", "s": 235.92, "e": 236.48, "c": 1.0},
+    {"t": "Paul.", "s": 236.48, "e": 237.38, "c": 0.5}
+   ],
+   "start": 234.8,
+   "end": 237.38
+  },
+  {
+   "id": "L085",
+   "section": "s11",
+   "style": "spoken",
+   "text": "And grandma?",
+   "cue": "Spoken, Sassy, Smiling",
+   "words": [
+    {"t": "And", "s": 238.96, "e": 239.12, "c": 1.0},
+    {"t": "grandma?", "s": 239.12, "e": 240.02, "c": 1.0}
+   ],
+   "start": 238.96,
+   "end": 240.02
+  },
+  {
+   "id": "L086",
+   "section": "s11",
+   "style": "spoken",
+   "text": "You really don't have to thank me every time.",
+   "words": [
+    {"t": "You", "s": 241.36, "e": 241.52, "c": 1.0},
+    {"t": "really", "s": 241.52, "e": 241.76, "c": 1.0},
+    {"t": "don't", "s": 241.76, "e": 242.0, "c": 1.0},
+    {"t": "have", "s": 242.0, "e": 242.08, "c": 1.0},
+    {"t": "to", "s": 242.08, "e": 242.16, "c": 1.0},
+    {"t": "thank", "s": 242.16, "e": 242.56, "c": 1.0},
+    {"t": "me", "s": 242.56, "e": 242.88, "c": 1.0},
+    {"t": "every", "s": 242.88, "e": 243.2, "c": 1.0},
+    {"t": "time.", "s": 243.2, "e": 244.1, "c": 1.0}
+   ],
+   "start": 241.36,
+   "end": 244.1
+  },
+  {
+   "id": "L087",
+   "section": "s11",
+   "style": "spoken",
+   "text": "...But that is very sweet.",
+   "words": [
+    {"t": "...But", "s": 245.84, "e": 246.0, "c": 1.0},
+    {"t": "that", "s": 246.0, "e": 246.32, "c": 1.0},
+    {"t": "is", "s": 246.32, "e": 247.2, "c": 1.0},
+    {"t": "very", "s": 247.2, "e": 247.52, "c": 1.0},
+    {"t": "sweet.", "s": 247.52, "e": 248.42, "c": 1.0}
+   ],
+   "start": 245.84,
+   "end": 248.42
+  },
+  {
+   "id": "L088",
+   "section": "s11",
+   "style": "punchline",
+   "text": "\"New message received.\"",
+   "cue": "Computer Shutdown Sound | Robotic Whisper",
+   "words": [
+    {"t": "\"New", "s": 255.92, "e": 256.32, "c": 1.0},
+    {"t": "message", "s": 256.32, "e": 257.04, "c": 1.0},
+    {"t": "received.\"", "s": 257.04, "e": 257.94, "c": 1.0}
+   ],
+   "start": 255.92,
+   "end": 257.94
+  },
+  {
+   "id": "L089",
+   "section": "s11",
+   "style": "punchline",
+   "text": "OH, COME ON!",
+   "cue": "Exasperated Female Voice",
+   "words": [
+    {"t": "OH,", "s": 259.12, "e": 260.02, "c": 1.0},
+    {"t": "COME", "s": 260.16, "e": 260.64, "c": 1.0},
+    {"t": "ON!", "s": 260.64, "e": 261.24, "c": 1.0}
+   ],
+   "start": 259.12,
+   "end": 261.24
+  }
+ ]
+}
