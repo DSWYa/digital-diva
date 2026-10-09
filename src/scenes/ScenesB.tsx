@@ -249,7 +249,7 @@ export const Philosophy: React.FC<SceneProps> = ({ seg, t, lt }) => {
         </Layer>
         <Layer depth={0.5}>
           <div style={{ position: "absolute", left: 100, top: 640, width: 1720, height: 300, background: "#2d5bd8", borderTop: `10px solid ${C.gold}` }}>
-            <div style={{ fontFamily: F.chorus, fontSize: 70, color: "#fff", padding: "30px 60px", textAlign: "right" }}>DIVA WEATHER · LIVE</div>
+            <div style={{ fontFamily: F.chorus, fontSize: 70, color: "#fff", padding: "190px 60px 0", textAlign: "right" }}>DIVA WEATHER · LIVE</div>
           </div>
         </Layer>
         <Layer depth={1}>
