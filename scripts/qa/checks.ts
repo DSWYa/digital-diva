@@ -80,6 +80,12 @@ segments.forEach((s) => {
   if (dur < 1.2) warn(`SHORT SCENE ${s.scene}#${s.index} lasts ${dur.toFixed(2)}s`);
   if (dur > 16 && Object.keys(s.items).length < 2) warn(`LONG SCENE ${s.scene}#${s.index} lasts ${dur.toFixed(1)}s`);
 });
+// lyrics must be gone before their scene ends (no spill into the next scene)
+groups.forEach((g) => {
+  const seg = segments[segAt(lines[g.ids[0]].start)];
+  if (g.end + EXIT > seg.end + 0.05) warn(`LYRIC SPILL ${lines[g.ids[0]].id} visible until ${fmt(g.end + EXIT)}, scene ${seg.scene} ends ${fmt(seg.end)}`);
+});
+
 // scenes must not change in the middle of a sung line
 import { segmentIndexAt as segAt } from "../../src/lib/plan";
 lines.forEach((l) => {
@@ -87,8 +93,9 @@ lines.forEach((l) => {
   const b = segAt(l.words[l.words.length - 1].s);
   if (a !== b) warn(`MID-LINE CUT ${l.id} "${l.text}" changes scene ${segments[a].scene} → ${segments[b].scene} at ${fmt(segments[b].start)}`);
 });
-const frames = Math.ceil(analysis.durationSec * 30);
-console.log(`duration ${analysis.durationSec}s → ${frames} frames (${(frames / 30).toFixed(3)}s); lines ${lines.length}; groups ${groups.length}; segments ${segments.length}`);
+const { outro } = await import("../../src/lib/plan");
+const frames = Math.ceil(outro.end * 30);
+console.log(`song ${analysis.durationSec}s, video ends ${outro.end}s (fade from ${outro.fadeStart}s) → ${frames} frames (${(frames / 30).toFixed(3)}s); lines ${lines.length}; groups ${groups.length}; segments ${segments.length}`);
 console.log(`word visibility failures: ${wordFails}`);
 console.log(issues.length ? issues.join("\n") : "no issues");
 

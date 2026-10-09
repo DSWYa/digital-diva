@@ -26,7 +26,7 @@ const isAccent = (w: string) => ACCENT.test(w.replace(/[^A-Za-z'-]/g, ""));
 export type Group = { ids: number[]; start: number; end: number };
 export const EXIT = 0.18;
 
-export const buildGroups = (segOf: (t: number) => number): Group[] => {
+export const buildGroups = (segOf: (t: number) => number, segEnd: (i: number) => number = () => Infinity): Group[] => {
   const groups: number[][] = [];
   for (let i = 0; i < lines.length; i++) {
     const l = lines[i];
@@ -60,7 +60,10 @@ export const buildGroups = (segOf: (t: number) => number): Group[] => {
     const end = Math.min(last.end + hold, next ? next.start - 0.45 : Infinity);
     // never fade the final word while it is still being sung (short crossfade instead)
     const lw = last.words[last.words.length - 1];
-    out.push({ ids, start, end: Math.max(end, Math.min(lw.e, lw.s + 0.5) - 0.02) });
+    // never fade the final word while it is sung, and never spill into the next scene
+    const sceneEnd = segEnd(segOf(first.start)) - EXIT;
+    const keep = Math.max(end, Math.min(lw.e, lw.s + 0.5) - 0.02);
+    out.push({ ids, start, end: Math.max(Math.min(keep, sceneEnd), (lw.s + lw.e) / 2) });
   });
   return out;
 };

@@ -3,7 +3,7 @@ import { AbsoluteFill, Img, random, staticFile, useCurrentFrame, useVideoConfig 
 import { Audio } from "@remotion/media";
 import { C, H, paletteVars, W } from "./theme";
 import { ensureFonts } from "./fonts";
-import { currentItem, groups, layoutOfGroup, paletteOfGroup, segments, Segment } from "./lib/plan";
+import { currentItem, groups, layoutOfGroup, outro, paletteOfGroup, segments, Segment } from "./lib/plan";
 import { hitPulse } from "./lib/timing";
 import { LyricLayer } from "./lyrics/Lyrics";
 import { ease, StyleCtx } from "./components/hud";
@@ -154,7 +154,14 @@ export const DigitalDiva: React.FC<DigitalDivaProps> = ({ showTimingDebug, qa = 
   const hit = hitPulse(t);
   return (
     <AbsoluteFill style={{ ...paletteVars("neon"), backgroundColor: C.bg, overflow: "hidden" }}>
-      <Audio src={staticFile("audio/digital-diva.mp3")} />
+      <Audio
+        src={staticFile("audio/digital-diva.mp3")}
+        volume={(f) => {
+          // smooth fade-out of the music at the end of the video
+          const p = Math.max(0, Math.min(1, (f / fps - outro.fadeStart) / (outro.end - outro.fadeStart)));
+          return Math.cos((p * Math.PI) / 2);
+        }}
+      />
       <SceneStack t={t} />
       <LyricLayer groups={groups} layoutOf={layoutOfGroup} styleOf={(g) => paletteVars(paletteOfGroup(g))} qa={qa} />
       <AbsoluteFill style={{ background: `radial-gradient(ellipse at 50% 120%, ${C.pink} 0%, transparent 50%)`, opacity: hit * 0.1, mixBlendMode: "screen", pointerEvents: "none" }} />

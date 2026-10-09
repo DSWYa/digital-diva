@@ -49,18 +49,21 @@ const switchTime = (id: string, lead: number) => {
   const i = lines.indexOf(l);
   const prev = lines[i - 1];
   const prevEnd = prev ? prev.words[prev.words.length - 1].e : 0;
-  return Math.min(l.start - 0.05, Math.max(l.start - lead, prevEnd - 0.05));
+  return Math.min(l.start - 0.05, Math.max(l.start - lead, prevEnd + 0.12));
 };
 const resolveAt = (at: string | number) => (typeof at === "number" ? at : Math.max(0, switchTime(at, LEAD)));
 
-const raw = (planJson as unknown as { segments: RawSegment[] }).segments;
+const plan = planJson as unknown as { segments: RawSegment[]; outro?: { fadeStart: number; end: number } };
+const raw = plan.segments;
+/** Where the music starts fading and the video ends. */
+export const outro = { fadeStart: plan.outro?.fadeStart ?? analysis.durationSec, end: Math.min(analysis.durationSec, plan.outro?.end ?? analysis.durationSec) };
 const starts = raw.map((s) => resolveAt(s.at));
 
 export const segments: Segment[] = raw.map((s, i) => ({
   ...s,
   index: i,
   start: starts[i],
-  end: i + 1 < raw.length ? starts[i + 1] : analysis.durationSec,
+  end: i + 1 < raw.length ? starts[i + 1] : outro.end,
   lyric: typeof s.lyric === "object" ? s.lyric : PRESETS[s.lyric ?? "bottom"] ?? PRESETS.bottom,
   items: s.items ?? {},
   // eslint-disable-next-line @remotion/non-pure-animation -- scene transition type, not CSS
@@ -75,7 +78,7 @@ export const segmentIndexAt = (t: number) => {
   return k;
 };
 
-export const groups: Group[] = buildGroups(segmentIndexAt);
+export const groups: Group[] = buildGroups(segmentIndexAt, (i) => segments[i].end);
 
 export const layoutOfGroup = (g: Group): LyricLayout => {
   const first = lines[g.ids[0]];

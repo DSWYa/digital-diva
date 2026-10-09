@@ -1,8 +1,9 @@
 import React from "react";
 import { AbsoluteFill } from "remotion";
-import { accentA, C, F, H, hiA, W } from "../theme";
-import { analysis, beatAt, beatPulse, energyAt, hitPulse, lines } from "../lib/timing";
+import { C, F, H, hiA, W } from "../theme";
+import { analysis, beatAt, beatPulse, energyAt, lines } from "../lib/timing";
 import { clamp01, ease } from "./hud";
+import { outro } from "../lib/plan";
 
 /** Interface chrome drawn over a scene (under the lyrics). Everything hugs the screen edges. */
 export type GuiKind = "editor" | "window" | "terminal" | "dashboard" | "player" | "none";
@@ -157,7 +158,7 @@ const Widget: React.FC<{ corner: string; t: number; title: string }> = ({ corner
 
 /** Media-player bar with a scrubber over the real song energy. */
 const Player: React.FC<{ t: number }> = ({ t }) => {
-  const dur = analysis.durationSec;
+  const dur = outro.end;
   const p = t / dur;
   const n = 180;
   const x0 = 250;
@@ -191,21 +192,6 @@ const Player: React.FC<{ t: number }> = ({ t }) => {
   );
 };
 
-/** OS mouse cursor that drifts around a point of interest and clicks on accents. */
-export const Cursor: React.FC<{ t: number; at: [number, number]; click?: number; paper?: boolean }> = ({ t, at, click = 0, paper }) => {
-  const x = at[0] + Math.sin(t * 0.45) * 120 + Math.sin(t * 1.3) * 18;
-  const y = at[1] + Math.cos(t * 0.37) * 80 + Math.cos(t * 1.1) * 12;
-  const ring = clamp01(click);
-  return (
-    <>
-      {ring > 0 && <div style={{ position: "absolute", left: x - 30 * (1 - ring) - 6, top: y - 30 * (1 - ring) - 6, width: 12 + 60 * (1 - ring), height: 12 + 60 * (1 - ring), borderRadius: "50%", border: `2px solid ${C.pink}`, opacity: ring }} />}
-      <svg width={28} height={34} style={{ position: "absolute", left: x, top: y, overflow: "visible", filter: "drop-shadow(0 2px 3px rgba(0,0,0,0.5))" }}>
-        <path d="M 1 1 L 1 24 L 7 18.5 L 11 28 L 15 26.5 L 11 17 L 19 17 Z" fill={paper ? "#111" : "#fff"} stroke={paper ? "#fff" : "#111"} strokeWidth={1.4} strokeLinejoin="round" />
-      </svg>
-    </>
-  );
-};
-
 export const Chrome: React.FC<{
   kind: GuiKind;
   t: number;
@@ -216,12 +202,11 @@ export const Chrome: React.FC<{
   cursor?: [number, number] | null;
   itemAge?: number;
   itemIndex?: number;
-}> = ({ kind, t, lt, title, paper, widget, cursor, itemAge = 99, itemIndex = 0 }) => {
+}> = ({ kind, t, lt, title, paper, widget, cursor, itemIndex = 0 }) => {
   if (kind === "none") return null;
   const lineNo = lines.filter((l) => l.start <= t).length;
   const b = beatAt(t);
   const mid = `line ${lineNo}/${lines.length} · bar ${Math.floor(b.n / 4) + 1} · beat ${(b.n % 4) + 1}`;
-  const click = itemAge < 0.35 ? 1 - itemAge / 0.35 : hitPulse(t) > 0.85 ? 0.5 : 0;
   const reveal = ease(lt / 0.35);
   const at: [number, number] = cursor ?? [1400, 640];
   const cx = at[0] + Math.sin(t * 0.45) * 120;
@@ -252,11 +237,6 @@ export const Chrome: React.FC<{
       )}
       {kind === "dashboard" && <Widget corner={widget ?? "tr"} t={t} title={title} />}
       {kind === "player" && <Player t={t} />}
-      {cursor !== null && kind !== "player" && kind !== "terminal" && <Cursor t={t} at={at} click={click} paper={paper} />}
-      {/* subtle selection marquee that blinks around the cursor target on item changes */}
-      {kind === "editor" && itemAge < 0.6 && (
-        <div style={{ position: "absolute", left: cx - 140, top: cy - 100, width: 280, height: 200, border: `1px dashed ${C.pink}`, opacity: 1 - itemAge / 0.6, background: accentA(0.04) }} />
-      )}
     </AbsoluteFill>
   );
 };

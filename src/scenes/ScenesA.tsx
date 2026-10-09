@@ -454,12 +454,12 @@ export const Specimen: React.FC<SceneProps> = ({ seg, t, lt }) => {
   // flight path for the airplane variant (same curve the lyric rides)
   const fp = (q: number) => {
     const x = (1 - q) ** 3 * 200 + 3 * (1 - q) ** 2 * q * 600 + 3 * (1 - q) * q * q * 1320 + q ** 3 * 1720;
-    const y = (1 - q) ** 3 * 860 + 3 * (1 - q) ** 2 * q * 520 + 3 * (1 - q) * q * q * 520 + q ** 3 * 860;
+    const y = (1 - q) ** 3 * 896 + 3 * (1 - q) ** 2 * q * 556 + 3 * (1 - q) * q * q * 556 + q ** 3 * 896;
     return [x, y];
   };
   const [px, py] = fp((lt * 0.25) % 1);
   return (
-    <Camera zoom={1 + lt * 0.012} y={-lt * 3}>
+    <Camera zoom={v === "airplane" ? 1 : 1 + lt * 0.012} y={v === "airplane" ? 0 : -lt * 3}>
       <Layer depth={0}>
         <Dark />
         <Grid size={40} opacity={0.55} />
@@ -503,15 +503,21 @@ export const Specimen: React.FC<SceneProps> = ({ seg, t, lt }) => {
           )}
           {v === "airplane" && (
             <g>
-              <Stroke d="M 200 860 C 600 520 1320 520 1720 860" dash="10 12" color={C.dim} w={1.5} p={p} />
-              <Smartphone x={810} y={110} s={0.55} p={p} />
-              <text x={892} y={250} fontFamily={F.mono} fontSize={20} fill={C.line}>
-                ✈ airplane
+              <Stroke d="M 200 896 C 600 556 1320 556 1720 896" dash="10 12" color={C.dim} w={1.5} p={p} />
+              <Smartphone x={855} y={110} s={0.7} p={p} />
+              <text x={884} y={235} fontFamily={F.mono} fontSize={19} fill={C.line}>
+                ✈ airplane mode
               </text>
-              <rect x={1000} y={232} width={56} height={26} rx={13} fill={plane > 0.5 ? C.pink : "none"} stroke={C.line} strokeWidth={1.5} />
-              <circle cx={1013 + plane * 30} cy={245} r={9} fill={C.white} />
-              <text x={892} y={330} fontFamily={F.mono} fontSize={20} fill={lt > 0.6 ? C.pink : C.line}>
+              <rect x={1012} y={262} width={50} height={24} rx={12} fill={plane > 0.5 ? C.pink : "none"} stroke={C.line} strokeWidth={1.5} />
+              <circle cx={1024 + plane * 26} cy={274} r={8} fill={C.white} />
+              <text x={884} y={281} fontFamily={F.mono} fontSize={17} fill={C.dim}>
+                {plane > 0.5 ? "on" : "off"}
+              </text>
+              <text x={884} y={350} fontFamily={F.mono} fontSize={19} fill={lt > 0.6 ? C.pink : C.line}>
                 {lt > 0.6 ? "call failed" : "calling Paul…"}
+              </text>
+              <text x={884} y={385} fontFamily={F.mono} fontSize={17} fill={C.dim}>
+                signal ▁ ▁ ▁ ▁
               </text>
               <g transform={`translate(${px} ${py}) rotate(${Math.atan2(fp(((lt * 0.25) % 1) + 0.01)[1] - py, fp(((lt * 0.25) % 1) + 0.01)[0] - px) * 57.3})`}>
                 <path d="M 30 0 L -20 -24 L -10 0 L -20 24 Z" fill={C.white} style={{ filter: `drop-shadow(0 0 8px ${C.pink})` }} />

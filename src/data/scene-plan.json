@@ -1,5 +1,6 @@
 {
   "_doc": "Scene timeline. 'at' = a line id (scene starts just before that line) or seconds. 'lyric' = a preset name (left, right, top, bottom, center, log, logDark) or a full layout object. 'items' = per-line beats inside the scene. 'transition' = cut | wipe | glitch | flash | fade. 'palette' = neon|cyan|amber|blueprint|violet|lime|alert|paperPink|paperBlue|paperGreen; 'bg' = grid|dots|blueprint|scan|iso|rings|hatch|aurora; 'gui' = editor|window|terminal|dashboard|player|none; 'cursor' = [x,y] the mouse hovers around (null hides it); 'widget' = corner for the dashboard card (tl|tr|bl|br).",
+  "outro": { "fadeStart": 255.0, "end": 263.5, "_doc": "music fades from fadeStart to end (seconds); the video ends at end" },
   "segments": [
     {"at": 0, "scene": "session", "lyric": "left", "items": {"L003": "plug", "L004": "patience"}, "palette": "neon", "bg": "dots", "gui": "terminal"},
     {"at": 18.0, "scene": "title", "lyric": "bottom", "transition": "wipe", "palette": "violet", "bg": "rings", "gui": "player"},
