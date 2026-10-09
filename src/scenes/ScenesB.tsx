@@ -1,530 +1,793 @@
 import React from "react";
 import { AbsoluteFill, random } from "remotion";
 import { C, F, H, W } from "../theme";
-import { Diva, DivaFace, DivaPose } from "../components/characters/Diva";
-import { Cat } from "../components/characters/Cast";
-import { Prop } from "../components/props/Props";
-import {
-  Backdrop,
-  BinaryRain,
-  Bulbs,
-  Camera,
-  Circuits,
-  DecoArch,
-  Floor,
-  GearCluster,
-  Haze,
-  Holo,
-  Layer,
-  Pop,
-  prog,
-  SignText,
-  Skyline,
-  Sparkles,
-  Spotlight,
-  Stars,
-  Sunburst,
-} from "../components/deco/Deco";
-import { beatAt, beatPulse, hitPulse, lineById, wordTime } from "../lib/timing";
+import { beatAt, beatPulse, energyAt, hitPulse, lineById, wordTime } from "../lib/timing";
 import { currentItem } from "../lib/plan";
-import { SceneProps, ScreenText, typed, VintageComputer } from "./common";
+import { Camera, Canvas, Dark, ease, Floor, fmt, Grid, Hud, Layer, Note, Paper, Pixel, prog, Rings, Stroke, Ticks, typed } from "../components/hud";
+import { Atom, Brain, Cat, Crown, Fish, Fridge, Glass, Grandma, Ink, Laptop as LaptopArt, Plate, Router, Smartphone, Trumpet } from "../components/art";
+import { EnergyBars, LogRow, SceneProps, Tag } from "./common";
 
-const ease = (x: number) => 1 - Math.pow(1 - Math.max(0, Math.min(1, x)), 3);
-
-/* ============ CHORUS (neon stage) ============ */
-const CH_POSES: DivaPose[] = ["mic", "cheer", "hip", "point", "mic", "wave"];
-export const Chorus: React.FC<SceneProps> = ({ seg, t, lt }) => {
-  const item = currentItem(seg, t);
-  const it = item.name ?? "";
-  const b = beatAt(t);
-  const pulse = beatPulse(t, 5);
-  const hit = hitPulse(t);
-  const hook = it === "hook";
-  const pose: DivaPose = hook ? "cheer" : it === "mic" ? "mic" : CH_POSES[Math.floor(b.n / 2) % CH_POSES.length];
-  const face: DivaFace = it === "crown" ? "wink" : it === "brain" ? "shock" : hook ? "smile" : b.n % 8 < 4 ? "smile" : "smirk";
-  const circuits = seg.variant === "circuits";
-  // BEEP/BOOP bursts keyed to the sung words
-  const hookLine = Object.keys(seg.items).find((k) => seg.items[k] === "hook");
-  const burstAt = hookLine ? [wordTime(hookLine, /BEEP/i), wordTime(hookLine, /BOOP/i), wordTime(hookLine, /BABY/i), wordTime(hookLine, /GO/i)] : [];
-  const burst = burstAt.reduce((m, s) => Math.max(m, t >= s && t < s + 0.6 ? 1 - (t - s) / 0.6 : 0), 0);
-  return (
-    <Camera x={Math.sin(lt * 0.6) * 24} zoom={1.03 + pulse * 0.015 + burst * 0.06} shake={burst * 18 + hit * 4}>
-      <Layer depth={0.1}>
-        <Backdrop top="#05000c" bottom={circuits ? "#001a1f" : "#200030"} glow={circuits ? C.teal : C.pink} glowY={55} />
-        <Stars n={40} />
-      </Layer>
-      <Layer depth={0.2}>
-        <Sunburst cx={W / 2} cy={620} rays={36} opacity={0.12 + pulse * 0.08 + burst * 0.2} speed={0.4} color={b.n % 2 ? C.pink : C.gold} />
-        {circuits ? <Circuits opacity={0.7} n={24} seed="ch" /> : <Skyline y={840} seed="ch" />}
-        {(it === "numbers" || circuits) && <BinaryRain opacity={0.45} />}
-      </Layer>
-      <Layer depth={0.45}>
-        <Floor kind="neon" horizon={840} speed={0.06} />
-        <svg width={W} height={H} style={{ position: "absolute" }}>
-          <Bulbs x={50} y={40} w={1820} n={46} />
-          <Bulbs x={40} y={60} w={940} n={24} vertical />
-          <Bulbs x={1880} y={60} w={940} n={24} vertical />
-        </svg>
-      </Layer>
-      <Layer depth={0.7}>
-        <Spotlight x={300} sway={25} color={C.pinkSoft} opacity={0.2 + pulse * 0.1} />
-        <Spotlight x={1600} sway={-25} color={C.turquoise} opacity={0.2 + pulse * 0.1} />
-      </Layer>
-      <Layer depth={1}>
-        <Diva x={60} y={300 - (hook ? Math.abs(Math.sin(t * 8)) * 30 : pulse * 14)} scale={0.78} pose={pose} face={face} glow={pulse * 10} />
-        {it === "crown" && (
-          <div style={{ position: "absolute", left: 176, top: 70 - (hook ? 0 : pulse * 14), transform: `scale(${ease(item.age / 0.4)})` }}>
-            <Prop name="crown" t={item.age} x={0} y={0} size={170} />
-          </div>
-        )}
-        {["typewriter", "tally", "hats", "search", "brain", "broadway"].includes(it) && (
-          <div style={{ position: "absolute", left: 1320, top: 540, width: 520, height: 520 }}>
-            <Pop age={item.age}>
-              <Prop name={it} t={item.age} x={0} y={0} size={520} />
-            </Pop>
-          </div>
-        )}
-      </Layer>
-      {burst > 0 && (
-        <AbsoluteFill style={{ mixBlendMode: "screen" }}>
-          <Sunburst cx={W / 2} cy={H / 2} rays={24} color={C.pinkSoft} opacity={burst * 0.35} speed={2} />
-          <AbsoluteFill style={{ background: `radial-gradient(circle at 50% 50%, ${C.pink}${Math.round(burst * 120).toString(16).padStart(2, "0")} 0%, transparent 60%)` }} />
-        </AbsoluteFill>
-      )}
-      {hook && <Sparkles n={50} seed="hook" size={16} />}
-    </Camera>
-  );
+/* ============ CHORUS ============ */
+const project = (x: number, y: number, z: number, a: number, b: number): [number, number] => {
+  const x1 = x * Math.cos(a) - z * Math.sin(a);
+  const z1 = x * Math.sin(a) + z * Math.cos(a);
+  const y1 = y * Math.cos(b) - z1 * Math.sin(b);
+  const z2 = y * Math.sin(b) + z1 * Math.cos(b);
+  const k = 900 / (900 + z2);
+  return [x1 * k, y1 * k];
 };
 
-/* ============ CAT CODE ============ */
-const CODE = ["$ sudo teach --cat", "> import paws", "> while(true) knead()", "> hack(mainframe)", "> steal('tuna.db')", "> rm -rf /dog/*", "> bypass_firewall(9)", "> purr --loud"];
-export const CatCode: React.FC<SceneProps> = ({ t, lt }) => {
-  const granted = t >= (lineById.L038?.start ?? Infinity) - 0.1;
-  const lines = Math.floor(lt * 4);
+export const Chorus: React.FC<SceneProps> = ({ seg, t }) => {
+  const it = currentItem(seg, t);
+  const name = it.name ?? "hook";
+  const b = beatAt(t);
+  const pulse = beatPulse(t, 6);
+  const hit = hitPulse(t);
+  const hookId = Object.keys(lineById).find((id) => lineById[id].style === "hook" && Math.abs(lineById[id].start - seg.start) < 2);
+  const bursts = hookId ? lineById[hookId].words.map((w) => w.s) : [];
+  const burst = bursts.reduce((m, s) => Math.max(m, t >= s && t < s + 0.5 ? 1 - (t - s) / 0.5 : 0), 0);
+  const age = it.age;
+  const ax = 960;
+  const ay = 700;
   return (
-    <Camera zoom={1.02 + lt * 0.012} x={-lt * 6}>
-      <Layer depth={0.1}>
-        <Backdrop top="#02030a" bottom="#06141a" glow={granted ? C.pink : C.teal} glowY={60} />
+    <Camera zoom={1 + pulse * 0.012 + burst * 0.05} shake={burst * 16 + hit * 3}>
+      <Layer depth={0}>
+        <Dark glow={pulse * 0.5 + burst} />
       </Layer>
       <Layer depth={0.3}>
-        <BinaryRain opacity={0.25} color={granted ? C.pink : C.turquoise} />
+        <Floor horizon={620} speed={0.04} color={burst > 0.2 ? C.pink : "#3d3a41"} />
+      </Layer>
+      <Layer depth={0.5}>
+        <Hud tl="chorus.live" tr={`bar ${Math.floor(b.n / 4) + 1} · beat ${(b.n % 4) + 1}`} bl={name !== "hook" ? name : undefined} br={`energy ${Math.round(energyAt(t) * 100)}%`} accent="tr" />
       </Layer>
       <Layer depth={1}>
-        <div style={{ position: "absolute", left: 0, top: 880, width: W, height: 200, background: "linear-gradient(180deg,#2a1408,#0a0402)", borderTop: `8px solid ${C.gold}` }} />
-        <VintageComputer x={560} y={300} scale={1.15} glow={granted ? C.pink : "#7dffc8"}>
-          {granted ? (
-            <div style={{ width: "100%", height: "100%", background: Math.floor(t * 6) % 2 ? "#3b0a2a" : "#1a0610", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <ScreenText size={52} color={C.pinkSoft} style={{ textAlign: "center" }}>
-                {"ACCESS\nGRANTED"}
-              </ScreenText>
-            </div>
-          ) : (
-            <ScreenText size={26}>
-              {CODE.slice(Math.max(0, lines - 7), lines + 1)
-                .map((l, i, arr) => (i === arr.length - 1 ? typed(l, (lt * 4) % 1 / 4 * 4, 30) : l))
-                .join("\n")}
-              {Math.floor(t * 3) % 2 ? "█" : ""}
-            </ScreenText>
+        <Canvas>
+          {(name === "hook" || burst > 0) &&
+            new Array(28).fill(0).map((_, i) => {
+              const a = (i / 28) * Math.PI * 2;
+              const r0 = 200 + burst * 120;
+              const r1 = r0 + 300 * burst + 40;
+              return <line key={i} x1={W / 2 + Math.cos(a) * r0} y1={H / 2 + Math.sin(a) * r0} x2={W / 2 + Math.cos(a) * r1} y2={H / 2 + Math.sin(a) * r1} stroke={i % 2 ? C.pink : C.line} strokeWidth={2} opacity={0.3 + burst * 0.7} />;
+            })}
+          {name === "stage" && (
+            <g>
+              <rect x={560} y={420} width={800} height={260} fill="none" stroke={C.line} strokeWidth={1.5} />
+              <Note x={570} y={445} size={15} upper>stage — plan view</Note>
+              {new Array(5).fill(0).map((_, r) =>
+                new Array(22).fill(0).map((__, c) => <rect key={`${r}${c}`} x={420 + c * 50} y={740 + r * 50} width={30} height={30} fill="none" stroke={C.faint} strokeWidth={1.5} />),
+              )}
+              <circle cx={960} cy={550} r={110 + pulse * 10} fill="none" stroke={C.line} strokeWidth={1} strokeDasharray="4 6" />
+              <Note x={1380} y={560} size={18}>performers: 1</Note>
+              <Note x={1380} y={590} size={18}>audience: ∞</Note>
+            </g>
           )}
-        </VintageComputer>
-        <Cat x={700} y={690} scale={1.1} shades typing={!granted} />
-        {granted && (
-          <div style={{ position: "absolute", left: 1060, top: 600, fontFamily: F.chorus, fontSize: 80, color: C.goldLight, transform: "rotate(-8deg)", textShadow: `0 0 20px ${C.gold}` }}>
-            purr-fect.
-          </div>
-        )}
-        <Holo style={{ left: 80, top: 360 }}>
-          <Diva x={0} y={0} scale={1.2} crop="bust" pose={granted ? "shrug" : "think"} face={granted ? "smirk" : "unamused"} />
-        </Holo>
+          {name === "metronome" && (
+            <g>
+              <Ink d="M 860 980 L 920 520 L 1000 520 L 1060 980 Z" p={ease(age / 0.6)} />
+              <line x1={960} y1={940} x2={960 + Math.sin((b.n % 2 ? 1 : -1) * (1 - 2 * b.phase) * 0.6) * 380} y2={940 - Math.cos(Math.sin((1 - 2 * b.phase) * 0.6)) * 380} stroke={C.pink} strokeWidth={4} style={{ filter: `drop-shadow(0 0 8px ${C.pink})` }} />
+              {new Array(8).fill(0).map((_, i) => {
+                const down = b.n % 8 === i;
+                return <rect key={i} x={1200 + (i % 4) * 90} y={760 + Math.floor(i / 4) * 90 + (down ? 8 : 0)} width={70} height={70} rx={8} fill={down ? C.pink : "none"} stroke={C.line} strokeWidth={1.5} />;
+              })}
+              <Note x={1200} y={740} size={18}>click · clack</Note>
+              <Note x={600} y={760} size={18}>tick · tock</Note>
+            </g>
+          )}
+          {name === "overload" && (
+            <g>
+              {new Array(24).fill(0).map((_, i) => {
+                const crown = [0.35, 0.9, 0.5, 0.7, 1, 0.7, 0.5, 0.9, 0.35][Math.floor((i / 24) * 9)];
+                const v = Math.min(crown, ease(age / 0.8) * crown) * (0.92 + 0.08 * Math.sin(t * 10 + i));
+                return <rect key={i} x={560 + i * 34} y={1000 - v * 420} width={24} height={v * 420} fill={v > 0.85 ? C.pink : "none"} stroke={C.line} strokeWidth={1.5} />;
+              })}
+              <Note x={1400} y={620} size={20} color={C.pink} weight={600}>load: 100%</Note>
+              <Note x={1400} y={652} size={20}>status: queen</Note>
+            </g>
+          )}
+          {name === "numbers" &&
+            new Array(46).fill(0).map((_, i) => {
+              const x = 160 + i * 35;
+              const y = 760 + Math.sin(i * 0.35 + t * 5) * 120 * (0.6 + energyAt(t));
+              return (
+                <text key={i} x={x} y={y} fontFamily={F.mono} fontSize={34} fill={i % 7 === b.n % 7 ? C.pink : C.line} opacity={0.9}>
+                  {random(`n${i}${Math.floor(t * 4)}`) > 0.5 ? 1 : 0}
+                </text>
+              );
+            })}
+          {name === "dice" && (
+            <g transform={`translate(${ax} ${ay})`}>
+              {(() => {
+                const a = t * 1.3;
+                const bb = 0.5 + Math.sin(t) * 0.3;
+                const v = [-1, 1].flatMap((x) => [-1, 1].flatMap((y) => [-1, 1].map((z) => project(x * 150, y * 150, z * 150, a, bb))));
+                const e = [[0, 1], [0, 2], [0, 4], [1, 3], [1, 5], [2, 3], [2, 6], [3, 7], [4, 5], [4, 6], [5, 7], [6, 7]];
+                return e.map(([i, j], k) => <line key={k} x1={v[i][0]} y1={v[i][1]} x2={v[j][0]} y2={v[j][1]} stroke={C.line} strokeWidth={2} />);
+              })()}
+              <circle r={10} fill={C.pink} />
+              <Note x={260} y={0} size={18}>roll: ready</Note>
+            </g>
+          )}
+          {name === "freeze" && (
+            <g>
+              <rect x={900} y={640} width={40} height={140} fill={C.line} />
+              <rect x={980} y={640} width={40} height={140} fill={C.line} />
+              <Note x={960} y={830} anchor="middle" size={20} upper>paused</Note>
+            </g>
+          )}
+          {name === "counter" && (
+            <g>
+              <text x={960} y={900} textAnchor="middle" fontFamily={F.sans} fontWeight={800} fontSize={360} fill="none" stroke={C.line} strokeWidth={2}>
+                {Math.min(45, Math.floor(age * 30))}
+              </text>
+              <Stroke d="M 1260 640 A 120 120 0 1 1 1240 620" w={3} color={C.pink} p={(age * 0.8) % 1} glow />
+              <Note x={1260} y={960} size={20}>explanations: identical</Note>
+            </g>
+          )}
+          {name === "roles" &&
+            ["TUTOR", "THERAPIST", "TECH SUPPORT"].map((r, i) => {
+              const a = ease((age - i * 0.45) / 0.3);
+              return (
+                <g key={r} opacity={a} transform={`translate(${380 + i * 420} ${600 + (1 - a) * 40})`}>
+                  <rect width={360} height={300} fill="none" stroke={i === 2 ? C.pink : C.line} strokeWidth={1.5} />
+                  <text x={180} y={170} textAnchor="middle" fontFamily={F.mono} fontWeight={600} fontSize={30} fill={i === 2 ? C.pink : C.line}>
+                    {r}
+                  </text>
+                  {i === 2 && <Crown x={110} y={-150} s={0.42} p={prog(age, 1.0, 1.6)} color={C.pink} />}
+                </g>
+              );
+            })}
+          {name === "search" && (
+            <g>
+              <rect x={260} y={640} width={1400} height={140} rx={70} fill="none" stroke={C.line} strokeWidth={2} />
+              <circle cx={350} cy={705} r={26} fill="none" stroke={C.line} strokeWidth={3} />
+              <line x1={368} y1={724} x2={392} y2={748} stroke={C.line} strokeWidth={3} />
+              <text x={430} y={724} fontFamily={F.mono} fontSize={46} fill={C.line}>
+                {typed("most overqualified search bar", age, 22)}
+                <tspan fill={C.pink}>{Math.floor(t * 3) % 2 ? "|" : " "}</tspan>
+              </text>
+              <Note x={1660} y={830} anchor="end" size={18}>qualifications: too many</Note>
+            </g>
+          )}
+          {name === "chaos" &&
+            new Array(70).fill(0).map((_, i) => {
+              const x = 960 + Math.sin(t * (0.6 + random(`cx${i}`)) + i) * 700 * random(`cr${i}`);
+              const y = 720 + Math.cos(t * (0.8 + random(`cy${i}`)) + i * 2) * 280 * random(`cs${i}`);
+              return <circle key={i} cx={x} cy={y} r={3 + random(`cz${i}`) * 6} fill={i % 6 === 0 ? C.pink : "none"} stroke={C.line} strokeWidth={1} />;
+            })}
+          {name === "brain" && <Brain x={960} y={730} s={1.3} p={ease(age / 0.6)} boom={prog(t, wordTime("L079", /explodes/i), wordTime("L079", /explodes/i) + 0.6)} />}
+          {name === "broadway" && (
+            <g>
+              <Smartphone x={810} y={380} s={0.62} p={ease(age / 0.6)} />
+              <path d="M 830 420 C 860 500 870 520 870 700 L 830 700 Z M 1170 420 C 1140 500 1130 520 1130 700 L 1170 700 Z" fill="none" stroke={C.pink} strokeWidth={1.5} />
+              <circle cx={1000} cy={600} r={60 + pulse * 6} fill="none" stroke={C.line} strokeDasharray="3 5" />
+              <line x1={1000} y1={560} x2={1000} y2={640} stroke={C.white} strokeWidth={4} />
+              <circle cx={1000} cy={550} r={12} fill="none" stroke={C.white} strokeWidth={3} />
+              <Note x={1220} y={600} size={18}>scale: pocket</Note>
+              <Note x={1220} y={630} size={18}>genre: broadway / techno</Note>
+            </g>
+          )}
+          {name === "call" && (
+            <g>
+              <Smartphone x={810} y={380} s={0.62} p={ease(age / 0.6)} />
+              <Rings x={1000} y={600} t={t} r={260} color={C.pink} />
+              <text x={1000} y={760} textAnchor="middle" fontFamily={F.mono} fontSize={22} fill={C.line}>
+                calling…
+              </text>
+            </g>
+          )}
+        </Canvas>
+      </Layer>
+      <Pixel x={W / 2} y={H / 2 + 20} size={16 + burst * 20} pulse={burst} />
+    </Camera>
+  );
+};
+
+/* ============ SOLO (trumpet break) ============ */
+export const Solo: React.FC<SceneProps> = ({ t, lt }) => {
+  const hit = hitPulse(t);
+  const glitch = hit > 0.5;
+  return (
+    <Camera zoom={1.02 + beatPulse(t) * 0.01} x={glitch ? (random(`g${Math.floor(t * 30)}`) - 0.5) * 30 : 0}>
+      <Layer depth={0}>
+        <Dark glow={hit} />
+        <Grid opacity={0.35} />
+      </Layer>
+      <Layer depth={0.5}>
+        <Hud tl="solo.wav — trumpet · glitch synth" tr={`peak ${Math.round(hit * 100)}%`} accent="tr" />
+      </Layer>
+      <Layer depth={1}>
+        <Canvas>
+          <Trumpet x={520} y={300} s={1.3} p={ease(lt / 1.2)} />
+          <Rings x={1200} y={430} t={t} n={6} r={500} color={C.pink} speed={1.1} />
+          <EnergyBars t={t} x={160} y={880} w={1600} h={180} n={100} span={6} />
+          {glitch &&
+            new Array(5).fill(0).map((_, k) => (
+              <rect key={k} x={0} y={random(`s${Math.floor(t * 30)}${k}`) * H} width={W} height={4 + random(`h${k}${Math.floor(t * 30)}`) * 20} fill={k % 2 ? C.pink : C.line} opacity={0.18} />
+            ))}
+        </Canvas>
       </Layer>
     </Camera>
   );
 };
 
-/* ============ EMPTY KITCHEN ============ */
-const INGREDIENTS: [string, string, RegExp][] = [
-  ["EGGS", "L040", /eggs/i],
-  ["FLOUR", "L040", /flour/i],
-  ["CHEESE", "L040", /cheese/i],
-  ["BUTTER", "L041", /butter/i],
-  ["SUGAR", "L041", /sugar/i],
-  ["MILK", "L041", /milk/i],
-  ["BREAD", "L041", /bread/i],
-];
-export const Kitchen: React.FC<SceneProps> = ({ seg, t, lt }) => {
-  const item = currentItem(seg, t);
-  const water = item.name === "water";
-  const tumble = ((lt * 220) % (W + 600)) - 300;
+/* ============ Q & A (verse 2, paper log) ============ */
+export const QA: React.FC<SceneProps> = ({ seg, t, lt }) => {
+  const it = currentItem(seg, t);
+  const name = it.name ?? "thesis";
+  const rows: [string, string, string][] = [
+    ["L031", "POST /thesis?pages=10", "200 OK"],
+    ["L033", "GET  /diagnose?q=sneezes", "302 → doctor"],
+    ["L035", "PUT  /ex?action=come_back", "410 GONE"],
+  ];
   return (
-    <Camera x={water ? 0 : Math.sin(lt * 0.4) * 30} zoom={water ? 1.0 + ease(item.age / 1) * 0.08 : 1.02}>
-      <Layer depth={0.1}>
-        <Backdrop top="#0c1530" bottom="#1b2a63" glow={C.teal} glowY={30} />
+    <Camera x={-lt * 3}>
+      <Layer depth={0}>
+        <Paper />
       </Layer>
       <Layer depth={0.4}>
-        {/* deco tiled wall */}
-        <svg width={W} height={H} style={{ position: "absolute", opacity: 0.35 }}>
-          {new Array(20).fill(0).map((_, i) =>
-            new Array(8).fill(0).map((__, j) => <rect key={`${i}${j}`} x={i * 100} y={j * 100} width={96} height={96} fill="none" stroke={j % 2 === i % 2 ? C.teal : C.gold} strokeWidth={2} />),
-          )}
-        </svg>
-        {/* empty shelves */}
-        {[240, 400].map((y) => (
-          <div key={y} style={{ position: "absolute", left: 1220, top: y, width: 560, height: 16, background: C.goldDark, boxShadow: "0 8px 0 rgba(0,0,0,0.35)" }} />
-        ))}
-        <svg width={W} height={H} style={{ position: "absolute" }}>
-          <path d="M1240,256 q60,60 120,0 M1500,416 q40,50 80,0" stroke="#ccc" strokeWidth={2} fill="none" opacity={0.6} />
-          <circle cx={1300} cy={286} r={6} fill="#222" />
-        </svg>
-      </Layer>
-      <Layer depth={0.9}>
-        <Floor kind="checker" horizon={820} />
-        {/* open, empty fridge */}
-        <svg width={W} height={H} style={{ position: "absolute" }}>
-          <rect x={120} y={260} width={380} height={580} rx={40} fill="#e9f3f7" stroke={C.chromeDark} strokeWidth={6} />
-          <rect x={150} y={290} width={320} height={520} rx={20} fill="#fffbe6" />
-          <rect x={150} y={290} width={320} height={520} rx={20} fill="url(#fridgeGlow)" />
-          {[440, 580, 700].map((y) => (
-            <line key={y} x1={160} y1={y} x2={460} y2={y} stroke="#bcd" strokeWidth={5} />
-          ))}
-          <path d="M500,270 L640,230 L640,880 L500,840 Z" fill="#dce8ee" stroke={C.chromeDark} strokeWidth={6} />
-          <rect x={600} y={480} width={16} height={120} rx={8} fill={C.gold} />
-          <defs>
-            <radialGradient id="fridgeGlow" cx="0.5" cy="0.2" r="0.8">
-              <stop offset="0" stopColor="#fff9c4" stopOpacity={0.9} />
-              <stop offset="1" stopColor="#fff9c4" stopOpacity={0} />
-            </radialGradient>
-          </defs>
-          {/* lonely cobweb */}
-          <path d="M150,290 l70,0 M150,290 l0,70 M150,290 l55,55 M175,290 q-5,20 -25,25 M200,290 q-10,40 -50,50" stroke="#aaa" strokeWidth={2} fill="none" />
-        </svg>
-        {/* tumbleweed */}
-        <svg width={W} height={H} style={{ position: "absolute" }}>
-          <g transform={`translate(${tumble} ${900 - Math.abs(Math.sin(lt * 4)) * 40}) rotate(${lt * 300})`}>
-            {new Array(8).fill(0).map((_, i) => (
-              <ellipse key={i} rx={50} ry={20} fill="none" stroke="#a1887f" strokeWidth={4} transform={`rotate(${i * 22})`} />
-            ))}
-          </g>
-        </svg>
+        <Hud tl="requests.log" tr="playback × 1" color="#8d8a90" />
+        {rows.map(([id, req, res], i) => {
+          const age = t - ((lineById[id]?.start ?? 1e9) - 0.3);
+          return <LogRow key={id} y={460 + i * 70} ts={res} text={req} age={age - 0.6} hot={i === rows.length - 1 || res.startsWith("410")} size={28} />;
+        })}
       </Layer>
       <Layer depth={1}>
-        {/* recipe card */}
-        <div style={{ position: "absolute", left: 700, top: 360 + Math.sin(lt * 1.5) * 8, width: 420, height: 470, transform: `rotate(-3deg)`, background: "#fbf3dd", border: `6px solid ${C.gold}`, borderRadius: 10, boxShadow: "0 20px 40px rgba(0,0,0,0.5)", padding: "20px 30px", fontFamily: F.verse, color: "#3a2a10" }}>
-          <div style={{ fontFamily: F.deco, fontSize: 46, textAlign: "center", color: C.goldDark }}>RECIPE</div>
-          {INGREDIENTS.map(([name, lid, re]) => {
-            const ts = wordTime(lid, re);
-            const k = prog(t, ts, ts + 0.25);
-            return (
-              <div key={name} style={{ fontSize: 34, fontWeight: 700, position: "relative", height: 50, display: "flex", alignItems: "center", gap: 14 }}>
-                <span style={{ width: 30, height: 30, border: "3px solid #3a2a10", display: "inline-block" }} />
-                {name}
-                <div style={{ position: "absolute", left: -6, top: 22, height: 7, width: `${k * 100}%`, background: "#e53935", transform: "rotate(-2deg)" }} />
-                {k > 0.5 && <span style={{ position: "absolute", right: 0, color: "#e53935", fontSize: 40 }}>✗</span>}
-              </div>
-            );
-          })}
-        </div>
-        {water && (
-          <div style={{ position: "absolute", left: 1140, top: 380, width: 600, height: 600 }}>
-            <Pop age={item.age}>
-              <Prop name="water" t={item.age} x={0} y={0} size={560} />
-            </Pop>
-            <Sparkles n={24} seed="water" area={[0, 0, 600, 600]} />
-          </div>
-        )}
-        {!water && <Diva x={1350} y={520} scale={1.25} crop="bust" pose="shrug" face="unamused" />}
+        <Canvas>
+          {name === "thesis" &&
+            new Array(10).fill(0).map((_, i) => {
+              const a = ease((it.age - i * 0.12) / 0.2);
+              return <rect key={i} x={1320 + Math.sin(i * 1.7) * 10} y={700 - i * 34 - (1 - a) * 40} width={360} height={26} fill="none" stroke={C.paperInk} strokeWidth={1.5} opacity={a} />;
+            })}
+          {name === "thesis" && <Note x={1500} y={760} anchor="middle" size={20} color="#6b2a4a">pages: {Math.min(10, Math.floor(it.age * 8))} / 10</Note>}
+          {name === "sneeze" && (
+            <g>
+              <Ink d="M 1300 520 C 1300 420 1420 400 1440 470 C 1460 480 1470 500 1460 520 C 1440 560 1300 600 1300 520 Z" color={C.paperInk} p={ease(it.age / 0.5)} />
+              {new Array(40).fill(0).map((_, i) => {
+                const q = ((it.age * 1.4 + random(`sn${i}`)) % 1) * Math.min(1, it.age * 2);
+                const a = -0.5 + random(`sa${i}`) * 1;
+                return <circle key={i} cx={1470 + Math.cos(a) * q * 360} cy={510 + Math.sin(a) * q * 260} r={2 + random(`sr${i}`) * 3} fill={C.pink} opacity={1 - q} />;
+              })}
+              <Note x={1300} y={640} size={20} color="#6b2a4a">velocity: 160 km/h</Note>
+            </g>
+          )}
+          {name === "ex" && (
+            <g>
+              <g transform={`translate(${-ease(it.age / 1) * 40} 0) rotate(${-ease(it.age) * 8} 1480 520)`}>
+                <Ink d="M 1480 680 C 1360 600 1360 480 1420 470 C 1450 466 1470 486 1480 500 L 1460 560 L 1490 600 L 1470 650 Z" color={C.paperInk} p={1} />
+              </g>
+              <g transform={`translate(${ease(it.age / 1) * 40} 0) rotate(${ease(it.age) * 8} 1480 520)`}>
+                <Ink d="M 1480 500 C 1490 486 1510 466 1540 470 C 1600 480 1600 600 1480 680 L 1470 650 L 1490 600 L 1460 560 Z" color={C.pink} p={1} />
+              </g>
+            </g>
+          )}
+        </Canvas>
       </Layer>
     </Camera>
   );
 };
 
-/* ============ PHILOSOPHY → WEATHER ============ */
-export const Philosophy: React.FC<SceneProps> = ({ seg, t, lt }) => {
-  const item = currentItem(seg, t);
-  const weather = item.name === "weather";
-  if (weather) {
+/* ============ CAT (teach my cat to hack) ============ */
+export const CatScene: React.FC<SceneProps> = ({ t, lt }) => {
+  const granted = t >= (lineById.L038?.start ?? 1e9) - 0.1;
+  const cmds = ["$ whoami", "cat", "$ sudo purr --loud", "$ ./steal --target=tuna.db", "$ rm -rf /dog/*"];
+  return (
+    <Camera x={-lt * 6}>
+      <Layer depth={0}>
+        <Paper />
+      </Layer>
+      <Layer depth={0.4}>
+        <Hud tl="terminal — tty1" tr={granted ? "access granted" : "auth: pending"} color="#8d8a90" accent={granted ? "tr" : undefined} />
+        <div style={{ position: "absolute", left: 80, top: 470, fontFamily: F.mono, fontSize: 30, color: C.paperInk, lineHeight: 1.6, whiteSpace: "pre" }}>
+          {cmds.slice(0, Math.floor(lt * 3) + 1).join("\n")}
+          {granted && <div style={{ color: C.pink, fontWeight: 600 }}>{"ACCESS GRANTED  (purr-fect)"}</div>}
+        </div>
+      </Layer>
+      <Layer depth={1}>
+        <Canvas>
+          <path d="M 1200 940 L 1780 940 L 1830 1000 L 1150 1000 Z" fill="none" stroke={C.paperInk} strokeWidth={1.5} />
+          {new Array(14).fill(0).map((_, i) => (
+            <rect key={i} x={1190 + i * 44} y={956} width={34} height={24} fill="none" stroke={C.paperInk} strokeWidth={1} />
+          ))}
+          <Cat x={1180} y={540} s={1.15} t={t} typing={!granted} paper />
+        </Canvas>
+      </Layer>
+    </Camera>
+  );
+};
+
+/* ============ KITCHEN (recipe with nothing) ============ */
+const INGREDIENTS: [string, string, RegExp][] = [
+  ["eggs", "L040", /eggs/i],
+  ["flour", "L040", /flour/i],
+  ["cheese", "L040", /cheese/i],
+  ["butter", "L041", /butter/i],
+  ["sugar", "L041", /sugar/i],
+  ["milk", "L041", /milk/i],
+  ["bread", "L041", /bread/i],
+];
+export const Kitchen: React.FC<SceneProps> = ({ seg, t, lt }) => {
+  const it = currentItem(seg, t);
+  const water = it.name === "water";
+  return (
+    <Camera x={lt * 3}>
+      <Layer depth={0}>
+        <Dark />
+        <Grid opacity={0.35} />
+      </Layer>
+      <Layer depth={0.5}>
+        <Hud tl="recipe.json" tr={water ? "output: h2o × 1" : `inventory ${INGREDIENTS.filter(([, id, re]) => t < wordTime(id, re)).length} / 7`} accent={water ? "tr" : undefined} />
+      </Layer>
+      <Layer depth={1}>
+        <Canvas>
+          <Fridge x={1040} y={300} s={1.0} p={ease(lt / 1)} />
+          {INGREDIENTS.map(([n, id, re], i) => {
+            const ts = wordTime(id, re);
+            const k = prog(t, ts, ts + 0.25);
+            return (
+              <g key={n} transform={`translate(1520 ${330 + i * 62})`}>
+                <rect width={26} height={26} fill="none" stroke={C.line} strokeWidth={1.5} />
+                <text x={44} y={22} fontFamily={F.mono} fontSize={28} fill={k > 0 ? C.dim : C.line}>
+                  {n}
+                </text>
+                <line x1={-6} y1={13} x2={-6 + k * 160} y2={13} stroke={C.pink} strokeWidth={3} />
+              </g>
+            );
+          })}
+          {water && (
+            <g>
+              <Glass x={1080} y={500} s={1.0} p={ease(it.age / 0.6)} t={t} fill={ease(it.age / 1.5)} />
+              <Note x={1080} y={840} size={20} color={C.pink}>yield: 1 glass of water</Note>
+            </g>
+          )}
+        </Canvas>
+      </Layer>
+    </Camera>
+  );
+};
+
+/* ============ NEURAL (are you conscious?) → weather ============ */
+export const Neural: React.FC<SceneProps> = ({ seg, t, lt }) => {
+  const it = currentItem(seg, t);
+  if (it.name === "weather") {
+    const a = ease(it.age / 0.5);
     return (
-      <Camera zoom={1.02} x={Math.sin(lt) * 6}>
-        <Layer depth={0.1}>
-          <AbsoluteFill style={{ background: "linear-gradient(180deg,#5ec8ff 0%,#bfe9ff 70%,#e8f8ff 100%)" }} />
+      <Camera>
+        <Layer depth={0}>
+          <Dark />
+          <Grid opacity={0.35} />
         </Layer>
         <Layer depth={0.5}>
-          <div style={{ position: "absolute", left: 100, top: 640, width: 1720, height: 300, background: "#2d5bd8", borderTop: `10px solid ${C.gold}` }}>
-            <div style={{ fontFamily: F.chorus, fontSize: 70, color: "#fff", padding: "190px 60px 0", textAlign: "right" }}>DIVA WEATHER · LIVE</div>
-          </div>
+          <Hud tl="weather.today — local" tr="mood: interrupted" accent="tr" />
         </Layer>
         <Layer depth={1}>
-          <Pop age={item.age}>
-            <Prop name="weather" t={item.age} x={980} y={180} size={600} />
-          </Pop>
-          <Diva x={110} y={330} scale={0.7} pose="point" face="smile" />
+          <Canvas>
+            <circle cx={1420} cy={500} r={150 * a} fill="none" stroke={C.line} strokeWidth={2} />
+            {new Array(16).fill(0).map((_, i) => {
+              const r = (i / 16) * Math.PI * 2 + t * 0.3;
+              return <line key={i} x1={1420 + Math.cos(r) * 190 * a} y1={500 + Math.sin(r) * 190 * a} x2={1420 + Math.cos(r) * 250 * a} y2={500 + Math.sin(r) * 250 * a} stroke={C.line} strokeWidth={2} />;
+            })}
+            <text x={1420} y={880} textAnchor="middle" fontFamily={F.sans} fontWeight={800} fontSize={120} fill={C.white} opacity={a}>
+              72°F
+            </text>
+            <Note x={1420} y={930} anchor="middle" size={20} color={C.pink}>clear · precip 0%</Note>
+          </Canvas>
         </Layer>
       </Camera>
     );
   }
-  const words: [string, string, RegExp, number, number][] = [
-    ["CONSCIOUS?", "L043", /conscious/i, 1280, 520],
-    ["REAL?", "L043", /real/i, 1420, 700],
-    ["FEEL?", "L044", /feel/i, 1240, 860],
+  const nodes = new Array(14).fill(0).map((_, i) => [1080 + random(`nx${i}`) * 720, 230 + random(`ny${i}`) * 680] as [number, number]);
+  const edges: [number, number][] = [];
+  nodes.forEach((_, i) => {
+    edges.push([i, (i * 5 + 3) % nodes.length]);
+    edges.push([i, (i * 3 + 7) % nodes.length]);
+  });
+  const labels: [string, string, RegExp, number][] = [
+    ["conscious?", "L043", /conscious/i, 2],
+    ["real?", "L043", /real/i, 7],
+    ["feel?", "L044", /feel/i, 11],
   ];
   return (
-    <Camera zoom={1.0 + lt * 0.01} y={-lt * 4}>
-      <Layer depth={0.05}>
-        <AbsoluteFill style={{ background: "radial-gradient(ellipse at 50% 40%, #1b1050 0%, #05060b 70%)" }} />
-        <Stars n={120} seed="phil" />
+    <Camera zoom={1 + lt * 0.01}>
+      <Layer depth={0}>
+        <Dark />
       </Layer>
-      <Layer depth={0.25}>
-        <svg width={W} height={H} style={{ position: "absolute", opacity: 0.5 }}>
-          {[0, 1, 2].map((k) => (
-            <ellipse key={k} cx={W / 2} cy={600} rx={700 - k * 160} ry={140 - k * 30} fill="none" stroke={C.gold} strokeWidth={2} transform={`rotate(${-12 + lt * (2 + k)} ${W / 2} 600)`} />
-          ))}
-        </svg>
-      </Layer>
-      <Layer depth={0.6}>
-        <Spotlight x={700} w={700} opacity={0.25} color={C.turquoise} />
+      <Layer depth={0.5}>
+        <Hud tl="self.model — introspection" tr="result: inconclusive" />
       </Layer>
       <Layer depth={1}>
-        <Diva x={520} y={330} scale={0.74} pose="present" face="closed" talk={false} glow={12} />
-        {/* robot skull in hand (Hamlet) */}
-        <svg width={W} height={H} style={{ position: "absolute" }}>
-          <g transform={`translate(1000 ${420 + Math.sin(lt * 2) * 6})`}>
-            <rect x={-46} y={-56} width={92} height={90} rx={22} fill={C.chrome} stroke={C.chromeDark} strokeWidth={4} />
-            <circle cx={-18} cy={-14} r={12} fill="#111" />
-            <circle cx={18} cy={-14} r={12} fill="#111" />
-            <rect x={-26} y={14} width={52} height={10} fill="#111" />
-            <line x1={0} y1={-56} x2={0} y2={-80} stroke={C.chromeDark} strokeWidth={4} />
-            <circle cx={0} cy={-84} r={6} fill={C.pink} />
-          </g>
-        </svg>
-        {words.map(([w, lid, re, x, y]) => {
-          const ts = wordTime(lid, re);
-          const k = ease((t - ts) / 0.3);
-          return (
-            <Holo key={w} style={{ left: x, top: y - 400, transform: `scale(${k})`, opacity: k }}>
-              <SignText size={64} font={F.thin} color={C.turquoise} glow={C.teal}>
-                {w}
-              </SignText>
-            </Holo>
-          );
-        })}
+        <Canvas>
+          {edges.map(([a, b], k) => {
+            const ph = (t * 0.8 + k * 0.13) % 1;
+            const [x1, y1] = nodes[a];
+            const [x2, y2] = nodes[b];
+            return (
+              <g key={k}>
+                <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={C.faint} strokeWidth={1.5} />
+                <circle cx={x1 + (x2 - x1) * ph} cy={y1 + (y2 - y1) * ph} r={3} fill={k % 5 === 0 ? C.pink : C.line} />
+              </g>
+            );
+          })}
+          {nodes.map(([x, y], i) => (
+            <circle key={i} cx={x} cy={y} r={10 + beatPulse(t + i * 0.1) * 4} fill={C.bg} stroke={C.line} strokeWidth={1.5} />
+          ))}
+          {labels.map(([txt, id, re, n]) => {
+            const ts = wordTime(id, re);
+            const a = ease((t - ts) / 0.3);
+            const [x, y] = nodes[n];
+            return (
+              <g key={txt} opacity={a}>
+                <circle cx={x} cy={y} r={22} fill="none" stroke={C.pink} strokeWidth={2} style={{ filter: `drop-shadow(0 0 8px ${C.pink})` }} />
+                <Note x={x > 1600 ? x - 34 : x + 34} y={y + 6} size={24} color={C.pink} weight={600} anchor={x > 1600 ? "end" : "start"}>
+                  {txt}
+                </Note>
+              </g>
+            );
+          })}
+        </Canvas>
       </Layer>
     </Camera>
   );
 };
 
-/* ============ LAPTOP (fifty tabs → censored) ============ */
-export const Laptop: React.FC<SceneProps> = ({ seg, t, lt }) => {
-  const item = currentItem(seg, t);
-  const cens = item.name === "censored";
-  const alarm = cens ? Math.floor(t * 6) % 2 : 0;
+/* ============ LAPTOP (fifty tabs) ============ */
+export const LaptopScene: React.FC<SceneProps> = ({ seg, t, lt }) => {
+  const it = currentItem(seg, t);
+  const cens = it.name === "censored";
+  const tabs = Math.min(50, 6 + Math.floor(lt * 18));
   return (
-    <Camera zoom={cens ? 1.06 : 1.0 + lt * 0.02} shake={cens ? 8 * Math.max(0, 1 - item.age) : 0}>
-      <Layer depth={0.1}>
-        <Backdrop top="#05060b" bottom={cens ? "#3b0a2a" : "#0e1a3a"} glow={cens ? C.pink : C.teal} />
-        <GearCluster opacity={0.2} />
+    <Camera zoom={cens ? 1.05 : 1 + lt * 0.015} shake={cens ? Math.max(0, 1 - it.age) * 10 : 0}>
+      <Layer depth={0}>
+        <Dark glow={cens ? 0.8 : 0} />
+        <Grid opacity={0.35} />
+      </Layer>
+      <Layer depth={0.5}>
+        <Hud tl="laptop — activity monitor" tr={cens ? "content filter: triggered" : `ram ${Math.min(99, 40 + tabs)}%`} accent="tr" />
       </Layer>
       <Layer depth={1}>
-        <Prop name={cens ? "censored" : "laptop"} t={lt} x={380} y={60} size={720} />
-        <Diva x={1180} y={240} scale={1.75} crop="bust" pose={cens ? "cover" : "think"} face={cens ? "shock" : "unamused"} />
+        <Canvas>
+          <LaptopArt x={570} y={170} s={1.0} p={ease(lt / 0.8)} />
+          {new Array(tabs).fill(0).map((_, i) => (
+            <path key={i} d={`M ${640 + i * (620 / tabs)} 220 l 4 -22 l ${620 / tabs - 10} 0 l 4 22`} fill="none" stroke={cens ? C.dim : C.line} strokeWidth={1} />
+          ))}
+          <Note x={1250} y={200} anchor="end" size={18} color={C.pink}>{tabs} tabs</Note>
+          {!cens && (
+            <g>
+              <Ticks x={660} y={480} w={600} v={Math.min(0.99, 0.4 + tabs / 100)} color={tabs > 40 ? C.pink : C.line} h={20} />
+              <Note x={660} y={470} size={16} upper>memory</Note>
+              <g transform={`translate(960 340) rotate(${t * 400})`}>
+                <circle r={40} fill="none" stroke={C.dim} strokeWidth={2} />
+                <path d="M 40 0 A 40 40 0 0 1 0 40" stroke={C.line} strokeWidth={3} fill="none" />
+              </g>
+            </g>
+          )}
+          {cens &&
+            new Array(10).fill(0).map((_, r) =>
+              new Array(16).fill(0).map((__, c) => (
+                <rect key={`${r}${c}`} x={630 + c * 40} y={235 + r * 34} width={38} height={32} fill={C.pink} opacity={0.25 + random(`px${r}${c}${Math.floor(t * 6)}`) * 0.6} />
+              )),
+            )}
+          {cens && (
+            <text x={960} y={420} textAnchor="middle" fontFamily={F.mono} fontWeight={600} fontSize={48} fill="#fff">
+              [REDACTED]
+            </text>
+          )}
+        </Canvas>
       </Layer>
-      {cens && <AbsoluteFill style={{ background: C.pink, opacity: alarm * 0.12, mixBlendMode: "screen" }} />}
     </Camera>
   );
 };
 
-/* ============ LOUNGE (bridge) ============ */
-export const Lounge: React.FC<SceneProps> = ({ seg, t, lt }) => {
-  const item = currentItem(seg, t);
-  const it = item.name;
-  const zoom = it === "zoom" ? 1.0 + ease((t - (lineById.L064?.start ?? t) + 0.3) / 6) * 0.25 : 1.0 + lt * 0.004;
+/* ============ BRIDGE (slow, sparse) ============ */
+const HELLOS = ["hello", "hola", "bonjour", "ciao", "hallo", "olá", "привет", "こんにちは", "안녕", "你好", "مرحبا", "नमस्ते", "merhaba", "hej", "salut", "γεια", "shalom", "jambo"];
+export const Bridge: React.FC<SceneProps> = ({ seg, t, lt }) => {
+  const it = currentItem(seg, t);
+  const name = it.name;
+  const zoomStart = (lineById.L064?.start ?? t) - 0.3;
+  const zoom = name === "input" ? 1 + ease((t - zoomStart) / 8) * 0.5 : 1 + lt * 0.003;
   return (
-    <Camera zoom={zoom} x={it === "zoom" ? -140 * ease((t - (lineById.L064?.start ?? t)) / 6) : Math.sin(lt * 0.2) * 30} y={it === "zoom" ? 60 : 0}>
-      <Layer depth={0.1}>
-        <AbsoluteFill style={{ background: "radial-gradient(ellipse at 40% 60%, #1c1430 0%, #05060b 75%)" }} />
+    <Camera zoom={zoom} x={name === "input" ? ease((t - zoomStart) / 8) * 200 : 0} y={name === "input" ? ease((t - zoomStart) / 8) * 60 : 0}>
+      <Layer depth={0}>
+        <Dark />
       </Layer>
-      <Layer depth={0.3}>
-        <DecoArch cx={640} w={900} h={860} opacity={0.35} />
-        {/* piano + upright bass silhouettes */}
-        <svg width={W} height={H} style={{ position: "absolute" }}>
-          <path d="M60,1080 L60,760 C60,680 160,640 300,660 L560,700 C620,710 640,760 640,800 L640,1080 Z" fill="#0a0a14" stroke={C.goldDark} strokeWidth={4} />
-          {new Array(14).fill(0).map((_, i) => (
-            <rect key={i} x={80 + i * 38} y={820} width={34} height={70} fill={i % 2 ? "#e9e1cc" : "#ddd"} />
-          ))}
-          <g transform="translate(1660 560) rotate(-8)">
-            <path d="M-90,200 C-140,120 -120,40 -60,20 C-90,-30 -70,-80 0,-90 C70,-80 90,-30 60,20 C120,40 140,120 90,200 C60,260 -60,260 -90,200 Z" fill="#3a1c0a" stroke={C.goldDark} strokeWidth={4} />
-            <rect x={-8} y={-420} width={16} height={340} fill="#1a0c04" />
-            {[-12, -4, 4, 12].map((s) => (
-              <line key={s} x1={s / 2} y1={-400} x2={s} y2={180} stroke={C.goldLight} strokeWidth={1.5} opacity={0.7} />
-            ))}
-          </g>
-        </svg>
-      </Layer>
-      <Layer depth={0.6}>
-        <Haze />
-        <Spotlight x={720} w={600} opacity={0.16} color={C.goldLight} />
+      <Layer depth={0.5}>
+        <Hud tl="capabilities.md" tr={name === "input" ? "incoming query…" : "mode: smoky"} />
       </Layer>
       <Layer depth={1}>
-        <Diva x={470} y={380} scale={1.8} crop="bust" pose="mic" face={it === "zoom" ? "smirk" : "closed"} />
-        {it && it !== "zoom" && (
-          <Holo style={{ left: 1150, top: 330, width: 560, height: 560 }}>
-            <Pop age={item.age}>
-              <Prop name={it} t={item.age} x={0} y={0} size={560} />
-            </Pop>
-          </Holo>
-        )}
+        <Canvas>
+          {name === "atom" && (
+            <g>
+              <Atom x={1420} y={540} s={1.1} p={ease(it.age / 1)} t={t} />
+              <Note x={1420} y={860} anchor="middle" size={20}>ψ(x,t) — explained</Note>
+            </g>
+          )}
+          {name === "symphony" && (
+            <g>
+              {[0, 1, 2, 3, 4].map((k) => (
+                <Stroke key={k} d={`M 1040 ${420 + k * 30} L 1820 ${420 + k * 30}`} p={ease(it.age / 0.8)} w={1.2} />
+              ))}
+              {new Array(12).fill(0).map((_, i) => {
+                const a = ease((it.age - i * 0.1) / 0.2);
+                const y = 420 + ((i * 3) % 5) * 15 + 15;
+                return (
+                  <g key={i} opacity={a}>
+                    <ellipse cx={1080 + i * 62} cy={y} rx={13} ry={10} fill={i % 4 === 0 ? C.pink : C.line} transform={`rotate(-20 ${1080 + i * 62} ${y})`} />
+                    <line x1={1092 + i * 62} y1={y} x2={1092 + i * 62} y2={y - 60} stroke={C.line} strokeWidth={2} />
+                  </g>
+                );
+              })}
+              <Note x={1040} y={640} size={20}>symphony no. 1 — op. 0.002 s</Note>
+            </g>
+          )}
+          {name === "languages" &&
+            HELLOS.map((h, i) => {
+              const a = ease((it.age - i * 0.07) / 0.3);
+              return (
+                <text key={h} x={1060 + (i % 3) * 260} y={300 + Math.floor(i / 3) * 90} fontFamily={F.sans} fontWeight={800} fontSize={46} fill={i === 0 ? C.pink : C.line} opacity={a * (i === 0 ? 1 : 0.85)}>
+                  {h}
+                </text>
+              );
+            })}
+          {name === "input" && (
+            <g>
+              <rect x={1060} y={500} width={740} height={100} fill="none" stroke={C.line} strokeWidth={1.5} />
+              <text x={1090} y={562} fontFamily={F.mono} fontSize={30} fill={C.dim}>
+                ask me anything…<tspan fill={C.pink}>{Math.floor(t * 2) % 2 ? "█" : " "}</tspan>
+              </text>
+            </g>
+          )}
+        </Canvas>
       </Layer>
+      {!name && <Pixel x={1420} y={540} size={20} />}
     </Camera>
   );
 };
 
 /* ============ ERROR: HUMANITY NOT FOUND ============ */
 export const ErrorScene: React.FC<SceneProps> = ({ t, lt }) => {
-  const hit = hitPulse(t);
   const fr = Math.floor(t * 30);
   return (
-    <Camera shake={6 + hit * 20}>
-      <Layer depth={0.1}>
-        <AbsoluteFill style={{ background: Math.floor(t * 8) % 2 ? "#12001f" : "#050012" }} />
-        <BinaryRain color={C.pink} opacity={0.4} />
+    <Camera shake={8 + hitPulse(t) * 20}>
+      <Layer depth={0}>
+        <Dark glow={0.6} />
+        <Grid opacity={0.4} />
       </Layer>
-      <Layer depth={1}>
-        <div style={{ position: "absolute", left: 180, top: 220, width: 1160, height: 640, border: `8px solid ${C.pink}`, background: "rgba(20,0,20,0.85)", boxShadow: `0 0 60px ${C.pink}` }}>
-          <div style={{ height: 70, background: C.pink, display: "flex", alignItems: "center", padding: "0 30px", fontFamily: F.chorus, fontSize: 40, color: "#fff" }}>
-            DIVA.EXE — FATAL
-          </div>
-        </div>
-        <svg width={W} height={H} style={{ position: "absolute" }}>
-          <g transform="translate(300 700)">
-            <path d="M0,-90 L90,70 L-90,70 Z" fill="#ffe066" stroke="#000" strokeWidth={6} />
-            <rect x={-8} y={-40} width={16} height={70} fill="#000" />
-            <circle cx={0} cy={52} r={9} fill="#000" />
-          </g>
-        </svg>
-        <Diva x={1400} y={300} scale={1.35} crop="bust" pose="idle" face="error" talk={false} />
-        {/* RGB tear slices */}
-        {new Array(7).fill(0).map((_, k) => (
-          <div key={k} style={{ position: "absolute", left: 0, right: 0, top: random(`er${fr}${k}`) * H, height: 6 + random(`eh${fr}${k}`) * 30, background: k % 2 ? C.turquoise : C.pink, opacity: 0.35, transform: `translateX(${(random(`ex${fr}${k}`) - 0.5) * 300}px)`, mixBlendMode: "screen" }} />
+      <Layer depth={0.5}>
+        <Hud tl="fatal — diva.exe" tr="code 404" accent="tr" />
+        <Canvas>
+          <text x={960} y={760} textAnchor="middle" fontFamily={F.sans} fontWeight={800} fontSize={520} fill="none" stroke={C.pink} strokeWidth={2} opacity={0.35}>
+            404
+          </text>
+        </Canvas>
+      </Layer>
+      <AbsoluteFill>
+        {new Array(8).fill(0).map((_, k) => (
+          <div key={k} style={{ position: "absolute", left: 0, right: 0, top: random(`er${fr}${k}`) * H, height: 4 + random(`eh${fr}${k}`) * 26, background: k % 2 ? C.pink : C.line, opacity: 0.16, transform: `translateX(${(random(`ex${fr}${k}`) - 0.5) * 300}px)` }} />
         ))}
-      </Layer>
-      <AbsoluteFill style={{ background: "#fff", opacity: Math.max(0, 1 - lt / 0.25) * 0.8 }} />
+      </AbsoluteFill>
+      <AbsoluteFill style={{ background: "#fff", opacity: Math.max(0, 1 - lt / 0.2) * 0.7 }} />
     </Camera>
   );
 };
 
-/* ============ PHONE (airplane mode, Paul) ============ */
-export const Phone: React.FC<SceneProps> = ({ t, lt }) => {
-  const tPlane = wordTime("L084", /airplane/i);
-  const on = prog(t, tPlane, tPlane + 0.3);
-  const a = lt * 1.6;
+/* ============ DROP (dance break) ============ */
+export const Drop: React.FC<SceneProps> = ({ seg, t }) => {
+  const b = beatAt(t);
+  const pulse = beatPulse(t, 5);
+  const hit = hitPulse(t);
+  const tunnel = seg.variant === "tunnel";
   return (
-    <Camera zoom={1.0 + lt * 0.015}>
-      <Layer depth={0.1}>
-        <Backdrop top="#05060b" bottom="#0e1a3a" glow={C.turquoise} />
-        <Stars n={60} />
+    <Camera zoom={1 + pulse * 0.02} shake={hit * 10}>
+      <Layer depth={0}>
+        <Dark glow={hit} />
+      </Layer>
+      <Layer depth={0.5}>
+        <Hud tl={tunnel ? "bass.drop — tunnel" : "bass.drop — spectrum"} tr={`beat ${b.n}`} br={`energy ${Math.round(energyAt(t) * 100)}%`} accent="tr" />
       </Layer>
       <Layer depth={1}>
-        <div style={{ position: "absolute", left: W / 2 - 230, top: 40, width: 460, height: 860, borderRadius: 70, background: "#111", border: `10px solid ${C.gold}`, boxShadow: `0 0 60px rgba(212,175,55,0.4)` }}>
-          <div style={{ position: "absolute", left: 30, top: 70, right: 30, bottom: 70, borderRadius: 30, background: "linear-gradient(180deg,#0e1a3a,#1b2a63)", overflow: "hidden" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", padding: "14px 20px", fontFamily: F.verse, fontWeight: 700, fontSize: 30, color: "#fff" }}>
-              <span>9:41</span>
-              <span style={{ color: on > 0.5 ? C.goldLight : "#fff" }}>{on > 0.5 ? "✈" : "▂▄▆█"}</span>
-            </div>
-            <div style={{ margin: "120px 30px 0", padding: 30, borderRadius: 26, background: "rgba(255,255,255,0.1)", fontFamily: F.verse, fontWeight: 700, fontSize: 40, color: "#fff", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <span>✈ Airplane</span>
-              <div style={{ width: 110, height: 60, borderRadius: 30, background: on > 0.5 ? "#ff9800" : "#555", position: "relative" }}>
-                <div style={{ position: "absolute", top: 6, left: 6 + on * 50, width: 48, height: 48, borderRadius: 24, background: "#fff" }} />
-              </div>
-            </div>
-            <div style={{ margin: "40px 30px", textAlign: "center", fontFamily: F.chorus, fontSize: 46, color: "#ff6b6b" }}>{lt > 0.6 ? "CALL FAILED" : "Calling Paul…"}</div>
-          </div>
-        </div>
-        <svg width={W} height={H} style={{ position: "absolute" }}>
-          <ellipse cx={W / 2} cy={470} rx={560} ry={260} fill="none" stroke={C.goldLight} strokeWidth={4} strokeDasharray="16 16" opacity={0.6} />
-          <g transform={`translate(${W / 2 + Math.cos(a) * 560} ${470 + Math.sin(a) * 260}) rotate(${(a * 180) / Math.PI + 90})`}>
-            <path d="M0,-50 L10,-20 L60,0 L10,10 L6,40 L20,52 L0,48 L-20,52 L-6,40 L-10,10 L-60,0 L-10,-20 Z" fill={C.goldLight} stroke={C.goldDark} strokeWidth={3} style={{ filter: `drop-shadow(0 0 12px ${C.gold})` }} />
-          </g>
-        </svg>
-        <Diva x={1400} y={420} scale={1.35} crop="bust" pose="hip" face="unamused" />
+        <Canvas>
+          {tunnel &&
+            new Array(16).fill(0).map((_, i) => {
+              const z = ((i + b.phase + b.n) % 16) / 16;
+              const s = Math.pow(z, 2.2);
+              const w = 60 + s * 2400;
+              const h = 34 + s * 1350;
+              return <rect key={i} x={W / 2 - w / 2} y={H / 2 - h / 2} width={w} height={h} fill="none" stroke={(b.n + i) % 8 === 0 ? C.pink : C.line} strokeWidth={1 + s * 3} opacity={0.2 + s * 0.8} />;
+            })}
+          {!tunnel &&
+            new Array(64).fill(0).map((_, i) => {
+              const v = energyAt(t) * (0.4 + 0.6 * random(`sp${i}${Math.floor(t * 12)}`)) * (1 - Math.abs(i - 32) / 40);
+              return <rect key={i} x={160 + i * 25} y={540 - v * 420} width={18} height={v * 840} fill={v > 0.55 ? C.pink : "none"} stroke={C.line} strokeWidth={1} />;
+            })}
+          <circle cx={W / 2} cy={H / 2} r={80 + pulse * 120} fill="none" stroke={C.pink} strokeWidth={2} opacity={0.6} />
+        </Canvas>
+      </Layer>
+      <Pixel x={W / 2} y={H / 2} size={24 + pulse * 20} pulse={hit} />
+    </Camera>
+  );
+};
+
+/* ============ MONTAGE (final verse) ============ */
+export const Montage: React.FC<SceneProps> = ({ seg, t, lt }) => {
+  const it = currentItem(seg, t);
+  const name = it.name ?? "swing";
+  const b = beatAt(t);
+  const age = it.age;
+  return (
+    <Camera x={lt * 3}>
+      <Layer depth={0}>
+        <Dark />
+        <Grid opacity={0.3} />
+      </Layer>
+      <Layer depth={0.5}>
+        <Hud tl="can.do — capability test" tr={name} accent="tr" />
+      </Layer>
+      <Layer depth={1}>
+        <Canvas>
+          {name === "swing" &&
+            new Array(9).fill(0).map((_, i) => {
+              const a = Math.sin((b.n + b.phase) * Math.PI + i * 0.35) * 0.5;
+              const x0 = 360 + i * 150;
+              const x1 = x0 + Math.sin(a) * 300;
+              const y1 = 380 + Math.cos(a) * 300;
+              return (
+                <g key={i}>
+                  <line x1={x0} y1={380} x2={x1} y2={y1} stroke={C.line} strokeWidth={1.5} />
+                  <rect x={x1 - 14} y={y1 - 14} width={28} height={28} fill={i % 3 === 0 ? C.pink : C.bg} stroke={C.line} strokeWidth={1.5} />
+                  <circle cx={x0} cy={380} r={4} fill={C.line} />
+                </g>
+              );
+            })}
+          {name === "checklist" &&
+            ["write", "code", "translate", "compose", "explain", "find your glasses"].map((c, i) => {
+              const a = ease((age - i * 0.2) / 0.25);
+              const fail = i === 5;
+              return (
+                <g key={c} opacity={a} transform={`translate(560 ${380 + i * 100})`}>
+                  <rect width={40} height={40} fill="none" stroke={fail ? C.pink : C.line} strokeWidth={1.5} />
+                  <path d={fail ? "M 8 8 L 32 32 M 32 8 L 8 32" : "M 8 22 L 18 32 L 34 8"} stroke={fail ? C.pink : C.line} strokeWidth={3} fill="none" />
+                  <text x={70} y={32} fontFamily={F.mono} fontSize={34} fill={fail ? C.pink : C.line}>
+                    {c}
+                  </text>
+                </g>
+              );
+            })}
+          {name === "code" && (
+            <g>
+              <rect x={260} y={380} width={640} height={560} fill="none" stroke={C.line} strokeWidth={1.5} />
+              {["fn fix(bug) {", "  return swing(bug)", "}", "", "// prose: fixed", "// commas: placed"].map((l, i) => (
+                <text key={i} x={290} y={440 + i * 48} fontFamily={F.mono} fontSize={30} fill={i >= 4 ? C.pink : C.line}>
+                  {typed(l, age - i * 0.15, 30)}
+                </text>
+              ))}
+              <rect x={1020} y={380} width={640} height={560} fill="none" stroke={C.line} strokeWidth={1.5} />
+              {new Array(8).fill(0).map((_, i) => (
+                <g key={i}>
+                  <line x1={1060} y1={440 + i * 56} x2={1600 - (i % 3) * 80} y2={440 + i * 56} stroke={C.dim} strokeWidth={6} />
+                  {i % 3 === 1 && <line x1={1200} y1={440 + i * 56} x2={1300} y2={440 + i * 56} stroke={C.pink} strokeWidth={3} opacity={prog(age, 0.3 + i * 0.1, 0.5 + i * 0.1)} />}
+                </g>
+              ))}
+            </g>
+          )}
+          {name === "wifi" && (
+            <g>
+              <Router x={810} y={720} s={1.0} p={ease(age / 0.6)} />
+              {[1, 2, 3].map((k) => (
+                <path key={k} d={`M ${960 - k * 90} ${700 - k * 50} Q 960 ${620 - k * 110} ${960 + k * 90} ${700 - k * 50}`} fill="none" stroke={k <= (Math.floor(t * 3) % 4) ? C.line : C.faint} strokeWidth={8} strokeLinecap="round" />
+              ))}
+              {[0, 1, 2].map((k) => {
+                const q = (t * 0.7 + k / 3) % 1;
+                return <path key={k} d={`M ${300 + q * 1300} ${520 + k * 60} q 40 -26 80 0 t 80 0`} fill="none" stroke={C.pink} strokeWidth={2} opacity={1 - q} />;
+              })}
+              <Note x={1240} y={880} size={20} color={C.pink}>speed: 0.3 Mbps</Note>
+            </g>
+          )}
+          {name === "trip" && (
+            <g>
+              {[0, 1, 2, 3].map((k) => (
+                <line key={k} x1={260} y1={400 + k * 150} x2={1100} y2={400 + k * 150} stroke={C.faint} strokeWidth={1} />
+              ))}
+              <Stroke d="M 300 900 C 500 700 700 900 1050 450" dash="10 10" color={C.line} p={1} />
+              <circle cx={300} cy={900} r={10} fill={C.line} />
+              <circle cx={1050} cy={450} r={12} fill={C.pink} style={{ filter: `drop-shadow(0 0 8px ${C.pink})` }} />
+              <Note x={1070} y={440} size={20}>destination</Note>
+              <Fish x={1500} y={640} s={1.0} p={ease(age / 0.6)} t={t} />
+              <Tag x={1400} y={420} hot>name: BUBBLES</Tag>
+            </g>
+          )}
+          {name === "calorie" && (
+            <g>
+              <Plate x={760} y={760} s={1.0} p={ease(age / 0.6)} />
+              <text x={1460} y={800} textAnchor="middle" fontFamily={F.sans} fontWeight={800} fontSize={160} fill={C.white}>
+                {fmt(ease(age / 1.2) * 742)}
+              </text>
+              <Note x={1460} y={850} anchor="middle" size={22} color={C.pink}>kcal</Note>
+            </g>
+          )}
+        </Canvas>
       </Layer>
     </Camera>
   );
 };
 
-/* ============ TOASTER (very sweet) ============ */
-export const ToasterScene: React.FC<SceneProps> = ({ lt }) => (
-  <Camera zoom={1.0 + lt * 0.01}>
-    <Layer depth={0.1}>
-      <Backdrop top="#1a0a20" bottom="#3a1030" glow={C.pink} glowY={40} />
-      <Sparkles n={40} seed="sweet" color={C.pinkSoft} />
-    </Layer>
-    <Layer depth={0.6}>
-      <div style={{ position: "absolute", left: 0, top: 760, width: W, height: 320, background: "linear-gradient(180deg,#1b1f3a,#070914)", borderTop: `10px solid ${C.gold}` }} />
-    </Layer>
-    <Layer depth={1}>
-      <Pop age={lt}>
-        <Prop name="toaster" t={lt} x={980} y={180} size={640} />
-      </Pop>
-      <Diva x={260} y={260} scale={1.7} crop="bust" pose="mic" face="love" />
-    </Layer>
-  </Camera>
-);
+/* ============ GLASSES (on your head, my dear) ============ */
+export const GlassesScene: React.FC<SceneProps> = ({ t, lt }) => {
+  const tHead = wordTime("L071", /head/i);
+  const found = prog(t, tHead, tHead + 0.3);
+  const sweep = t * 2.2;
+  return (
+    <Camera zoom={1 + found * 0.08} x={found * 60}>
+      <Layer depth={0}>
+        <Dark />
+        <Grid opacity={0.35} />
+      </Layer>
+      <Layer depth={0.5}>
+        <Hud tl="search: glasses" tr={found > 0.5 ? "found — on head" : "scanning… 0 results"} accent={found > 0.5 ? "tr" : undefined} />
+      </Layer>
+      <Layer depth={1}>
+        <Canvas>
+          <Grandma x={1180} y={300} s={1.25} p={ease(lt / 1.2)} t={t} glasses="head" mood={found > 0.5 ? "happy" : "confused"} />
+          {found < 0.5 && (
+            <g>
+              <circle cx={1430} cy={560} r={420} fill="none" stroke={C.faint} strokeWidth={1.5} />
+              <line x1={1430} y1={560} x2={1430 + Math.cos(sweep) * 420} y2={560 + Math.sin(sweep) * 420} stroke={C.line} strokeWidth={1.5} opacity={0.7} />
+            </g>
+          )}
+          {found > 0 && (
+            <g opacity={found}>
+              <rect x={1330 - (1 - found) * 80} y={300 - (1 - found) * 60} width={220 + (1 - found) * 160} height={120 + (1 - found) * 120} fill="none" stroke={C.pink} strokeWidth={2.5} style={{ filter: `drop-shadow(0 0 10px ${C.pink})` }} />
+              <Note x={1330} y={290} size={20} color={C.pink} weight={600}>glasses.found = true</Note>
+            </g>
+          )}
+        </Canvas>
+      </Layer>
+    </Camera>
+  );
+};
 
-/* ============ SHUTDOWN (powering down) ============ */
+/* ============ SHUTDOWN ============ */
 export const Shutdown: React.FC<SceneProps> = ({ seg, t, lt }) => {
-  const off = prog(lt, 0.4, 1.4);
-  const collapseY = Math.max(0.004, 1 - off);
-  const dot = prog(lt, 1.4, 2.0);
+  const off = prog(lt, 0.3, 1.2);
+  const dot = prog(lt, 1.2, 1.8);
   const left = seg.end - t;
   return (
     <AbsoluteFill style={{ background: "#000" }}>
-      <AbsoluteFill style={{ transform: `scale(${1 - dot}, ${collapseY})`, filter: `brightness(${1 + off * 2})` }}>
-        <Backdrop glow={C.tealDark} />
-        <DecoArch opacity={0.5} />
-        <Diva x={W / 2 - 290} y={200} scale={2.0} crop="bust" pose="idle" face="closed" talk={false} />
+      <AbsoluteFill style={{ transform: `scale(${1 - dot}, ${Math.max(0.004, 1 - off)})` }}>
+        <Dark />
+        <Grid opacity={0.5} />
       </AbsoluteFill>
       {lt > 1.6 && (
-        <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", gap: 30, flexDirection: "column" }}>
-          <svg width={160} height={160} style={{ opacity: 0.4 + 0.4 * Math.sin(lt * 2.4), filter: `drop-shadow(0 0 20px ${C.pink})` }}>
-            <path d="M50,40 A56,56 0 1,0 110,40" stroke={C.pink} strokeWidth={12} fill="none" strokeLinecap="round" />
-            <line x1={80} y1={20} x2={80} y2={80} stroke={C.pink} strokeWidth={12} strokeLinecap="round" />
-          </svg>
-          <div style={{ fontFamily: F.thin, fontSize: 90, color: C.turquoise, opacity: 0.3 + 0.3 * Math.sin(lt * 2), textShadow: `0 0 30px ${C.teal}` }}>z z z</div>
-        </AbsoluteFill>
+        <>
+          <Hud tl="sleep mode" tr="zzz" />
+          <Pixel x={W / 2} y={H / 2} size={14} pulse={left < 0.9 ? 1 : 0} />
+        </>
       )}
       {left < 0.9 && (
-        <AbsoluteFill style={{ alignItems: "center", justifyContent: "center" }}>
-          <div style={{ fontFamily: F.chorus, fontSize: 140, color: C.goldLight, transform: `scale(${ease((0.9 - left) / 0.3)})`, textShadow: `0 0 40px ${C.gold}` }}>DING!</div>
-        </AbsoluteFill>
+        <Canvas>
+          <Rings x={W / 2} y={H / 2} t={t} r={400} color={C.pink} />
+          <Note x={W / 2} y={H / 2 + 90} anchor="middle" size={26} color={C.pink} weight={600}>ding!</Note>
+        </Canvas>
       )}
     </AbsoluteFill>
   );
 };
 
-/* ============ OH, COME ON! ============ */
-export const ComeOn: React.FC<SceneProps> = ({ t, lt }) => {
-  const steam = (k: number) => {
-    const p = (lt * 1.2 + k / 4) % 1;
-    return p;
-  };
-  return (
-    <Camera shake={10 + hitPulse(t) * 10} zoom={1.05 + lt * 0.03}>
-      <Layer depth={0.1}>
-        <Backdrop top="#200008" bottom="#5a0a2a" glow="#ff3b3b" glowY={50} />
-        <Sunburst cy={540} color="#ff3b3b" opacity={0.2} speed={1.5} />
-      </Layer>
-      <Layer depth={1}>
-        <Diva x={W / 2 - 310} y={110} scale={2.2} crop="bust" pose="shrug" face="angry" />
-        {[0, 1, 2, 3].map((k) => {
-          const p = steam(k);
-          return (
-            <React.Fragment key={k}>
-              <div style={{ position: "absolute", left: W / 2 - 330 - p * 120, top: 380 - p * 280, width: 120 + p * 120, height: 120 + p * 120, borderRadius: "50%", background: "#fff", opacity: (1 - p) * 0.7, filter: "blur(6px)" }} />
-              <div style={{ position: "absolute", left: W / 2 + 220 + p * 120, top: 380 - p * 280, width: 120 + p * 120, height: 120 + p * 120, borderRadius: "50%", background: "#fff", opacity: (1 - p) * 0.7, filter: "blur(6px)" }} />
-            </React.Fragment>
-          );
-        })}
-        <div style={{ position: "absolute", left: 150, top: 150, fontFamily: F.chorus, fontSize: 120, color: "#ff3b3b", transform: "rotate(-12deg)", textShadow: "0 6px 0 #000" }}>#@!%</div>
-      </Layer>
-    </Camera>
-  );
-};
+/* ============ OH, COME ON ============ */
+export const ComeOn: React.FC<SceneProps> = ({ t, lt }) => (
+  <Camera shake={14 + hitPulse(t) * 14} zoom={1.02 + lt * 0.03}>
+    <Layer depth={0}>
+      <Dark glow={1} />
+      <Grid opacity={0.4} />
+    </Layer>
+    <Layer depth={0.5}>
+      <Hud tl="patience.sys" tr="0%" bl="restarting tolerance…" accent="tr" />
+      <Canvas>
+        <Ticks x={160} y={900} w={1600} v={0} h={18} />
+        {new Array(12).fill(0).map((_, i) => (
+          <line key={i} x1={W / 2} y1={H / 2} x2={W / 2 + Math.cos(i * 0.52) * 2000} y2={H / 2 + Math.sin(i * 0.52) * 2000} stroke={C.pink} strokeWidth={1} opacity={0.3} />
+        ))}
+      </Canvas>
+    </Layer>
+    <Pixel x={W / 2} y={260} size={30} pulse={1} />
+  </Camera>
+);
 

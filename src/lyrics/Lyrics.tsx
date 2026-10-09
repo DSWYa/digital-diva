@@ -1,364 +1,249 @@
 import React from "react";
-import { AbsoluteFill, Easing, interpolate, useCurrentFrame, useVideoConfig } from "remotion";
+import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { C, F } from "../theme";
-import { beatPulse, Line, lines, Word } from "../lib/timing";
+import { Line, lines, Word } from "../lib/timing";
+import { clamp01, ease } from "../components/hud";
 
-export type ZoneName = "bottom" | "top" | "left" | "right" | "center" | "upper" | "stage";
-export type Zone = { x: number; y: number; w: number; h: number };
-export const ZONES: Record<ZoneName, Zone> = {
-  bottom: { x: 140, y: 770, w: 1640, h: 250 },
-  top: { x: 140, y: 60, w: 1640, h: 250 },
-  upper: { x: 140, y: 130, w: 1640, h: 300 },
-  left: { x: 90, y: 230, w: 860, h: 620 },
-  right: { x: 970, y: 230, w: 860, h: 620 },
-  center: { x: 140, y: 290, w: 1640, h: 500 },
-  stage: { x: 600, y: 110, w: 1240, h: 560 },
+export type LyricKind = "block" | "log" | "path" | "slam";
+export type LyricLayout = {
+  kind: LyricKind;
+  x: number;
+  y: number;
+  w: number;
+  size: number;
+  align?: "left" | "center" | "right";
+  angle?: number;
+  path?: string;
+  paper?: boolean;
 };
 
-const clamp01 = (x: number) => Math.max(0, Math.min(1, x));
-const easeOut = (x: number) => 1 - Math.pow(1 - clamp01(x), 3);
-const backOut = (x: number) => {
-  const c = 1.9;
-  const p = clamp01(x) - 1;
-  return 1 + (c + 1) * p * p * p + c * p * p;
-};
+/** Words that stay pink after they're sung: the nouns the scenes are about. */
+const ACCENT =
+  /^(grandma'?s?|robot|paragraphs|prayer|rocking|chair|feelings|coffee|make|bucks|ducks|wedding|vows|cows|question|suggestion|information|potato|beep|boop|baby|show|code|overload|electricity|roll|printer|paper|nicole|thesis|sneezes|doctor|ex|cat|hack|possibly|recipe|eggs|flour|cheese|butter|sugar|milk|bread|water|conscious|real|feel|weather|moon|sky|laptop|slow|tabs|pornography|forty-five|tutor|therapist|tech|support|queen|search|bar|funny|quantum|physics|symphony|languages|mayonnaise|instrument|error|humanity|found|circuits|diva|anything|glasses|head|prose|wi-fi|fish|calorie|dish|chaotic|brain|explodes|broadway|techno|call|airplane|paul|sweet|message|received|sure|nope)$/i;
+const isAccent = (w: string) => ACCENT.test(w.replace(/[^A-Za-z'-]/g, ""));
 
-type StyleSpec = {
-  font: string;
-  upper: boolean;
-  maxSize: number;
-  charW: number;
-  lead: number;
-  gap: number;
-};
-const SPECS: Record<Line["style"], StyleSpec> = {
-  verse: { font: F.verse, upper: false, maxSize: 96, charW: 0.5, lead: 0.3, gap: 0.26 },
-  prechorus: { font: F.chorus, upper: true, maxSize: 104, charW: 0.6, lead: 0.25, gap: 0.24 },
-  chorus: { font: F.chorus, upper: true, maxSize: 124, charW: 0.6, lead: 0.3, gap: 0.24 },
-  hook: { font: F.neon, upper: true, maxSize: 190, charW: 0.95, lead: 0.12, gap: 0.2 },
-  punchline: { font: F.deco, upper: false, maxSize: 118, charW: 0.56, lead: 0.12, gap: 0.24 },
-  response: { font: F.chorus, upper: true, maxSize: 150, charW: 0.62, lead: 0.05, gap: 0.2 },
-  spoken: { font: F.deco, upper: false, maxSize: 104, charW: 0.55, lead: 0.35, gap: 0.26 },
-};
+/* ---------- grouping: lines appear in couplets ---------- */
+export type Group = { ids: number[]; start: number; end: number };
+const EXIT = 0.22;
 
-/** When each line is on screen: [in, out]. Exit animation runs for EXIT seconds after out. */
-const EXIT = 0.25;
-export const lineWindow = (i: number): [number, number] => {
-  const l = lines[i];
-  const next = lines[i + 1];
-  const spec = SPECS[l.style];
-  const tin = l.start - spec.lead;
-  let tout = l.end + (l.style === "punchline" || l.style === "spoken" ? 1.6 : 1.0);
-  if (next) {
-    if (next.style === "response" && l.style !== "response") {
-      const after = lines[i + 2];
-      tout = Math.min(next.end + 0.5, after ? after.start - 0.15 : Infinity);
-    } else {
-      tout = Math.min(tout, next.start - SPECS[next.style].lead);
-    }
+export const buildGroups = (segOf: (t: number) => number): Group[] => {
+  const groups: number[][] = [];
+  for (let i = 0; i < lines.length; i++) {
+    const l = lines[i];
+    const cur = groups[groups.length - 1];
+    const prev = cur ? lines[cur[cur.length - 1]] : undefined;
+    const solo = (x: Line) => x.style === "hook" || x.style === "punchline";
+    const joinResponse = cur && l.style === "response" && cur.length <= 2;
+    const canJoin =
+      cur &&
+      prev &&
+      (joinResponse ||
+        (cur.filter((k) => lines[k].style !== "response").length < 2 &&
+          !solo(l) &&
+          !solo(prev) &&
+          segOf(l.start) === segOf(lines[cur[0]].start) &&
+          l.start - prev.end < 2.5 &&
+          cur.reduce((n, k) => n + lines[k].text.length, 0) + l.text.length < 90 &&
+          !(prev.style === "response")));
+    if (canJoin) cur.push(i);
+    else groups.push([i]);
   }
-  return [tin, Math.max(tout, tin + 0.4)];
+  const out: Group[] = [];
+  groups.forEach((ids, gi) => {
+    const first = lines[ids[0]];
+    const last = lines[ids[ids.length - 1]];
+    const next = groups[gi + 1] ? lines[groups[gi + 1][0]] : undefined;
+    const prevEnd = out.length ? out[out.length - 1].end : -Infinity;
+    // wait for the previous couplet to finish leaving, but never start after the first word
+    const start = Math.min(first.start - 0.12, Math.max(first.start - 0.35, prevEnd + EXIT));
+    const hold = last.style === "punchline" || last.style === "spoken" ? 1.8 : 1.2;
+    const end = Math.min(last.end + hold, next ? next.start - 0.45 : Infinity);
+    out.push({ ids, start, end: Math.max(end, last.end - 0.2) });
+  });
+  return out;
 };
 
-const fit = (text: string, spec: StyleSpec, zone: Zone, scale: number) => {
-  const chars = text.length;
-  const max = spec.maxSize * scale;
-  const oneRow = zone.w / (chars * spec.charW);
-  if (oneRow >= max * 0.82) return Math.min(max, oneRow);
-  const twoRow = Math.min((zone.w * 2) / (chars * spec.charW * 1.08), zone.h / 2.5);
-  if (twoRow >= max * 0.72 || zone.w >= 1000) return Math.min(max, twoRow);
-  const threeRow = Math.min((zone.w * 3) / (chars * spec.charW * 1.12), zone.h / 3.4);
-  return Math.min(max, Math.max(twoRow, threeRow));
-};
-
-const HOOK_COLORS = [C.pink, C.turquoise, C.goldLight, C.pink, C.turquoise, C.goldLight];
-
-const WordSpan: React.FC<{
-  w: Word;
-  idx: number;
-  t: number;
-  style: Line["style"];
-  spec: StyleSpec;
-  debug: boolean;
-}> = ({ w, idx, t, style, spec, debug }) => {
-  const dt = t - w.s;
-  const dur = Math.max(0.12, w.e - w.s);
-  const active = dt >= 0 && dt <= dur + 0.05;
-  const sung = dt >= 0;
-  const text = spec.upper ? w.t.toUpperCase() : w.t;
-  const base: React.CSSProperties = {
-    display: "inline-block",
-    marginRight: `${spec.gap}em`,
-    whiteSpace: "nowrap",
-    willChange: "transform",
-    borderBottom: debug && w.u ? "4px dashed #ff4040" : undefined,
-  };
-  const outline = "0 3px 0 rgba(0,0,0,0.85), 0 0 22px rgba(0,0,0,0.75)";
-
-  switch (style) {
-    case "verse": {
-      const k = easeOut(dt / 0.22);
-      const bump = active ? Math.sin(Math.PI * clamp01(dt / 0.3)) : 0;
-      return (
-        <span
-          style={{
-            ...base,
-            color: active ? C.goldLight : sung ? C.cream : "rgba(246,234,208,0.32)",
-            transform: `translateY(${sung ? (1 - k) * 22 - bump * 6 : 0}px) scale(${1 + bump * 0.12})`,
-            textShadow: active ? `0 0 18px ${C.gold}, ${outline}` : outline,
-          }}
-        >
-          {text}
-        </span>
-      );
-    }
-    case "prechorus": {
-      const k = easeOut(dt / 0.16);
-      return (
-        <span
-          style={{
-            ...base,
-            opacity: sung ? 1 : 0.12,
-            color: active ? C.pinkSoft : C.turquoise,
-            transform: `perspective(600px) rotateX(${sung ? (1 - k) * 85 : 70}deg)`,
-            textShadow: active ? `0 0 24px ${C.pink}, ${outline}` : `0 0 14px ${C.tealDark}, ${outline}`,
-          }}
-        >
-          {text}
-        </span>
-      );
-    }
-    case "chorus": {
-      const ignite = clamp01(dt / 0.12);
-      const flicker = dt > 0 && dt < 0.14 ? (Math.floor(dt * 60) % 2 ? 0.5 : 1) : 1;
-      const pop = sung ? 1 + (1 - easeOut(dt / 0.25)) * 0.16 : 1;
-      const lit = sung ? flicker : 0;
-      return (
-        <span
-          style={{
-            ...base,
-            color: lit ? "#fff7fb" : "transparent",
-            WebkitTextStroke: lit ? `2px ${C.pink}` : `2px rgba(212,175,55,0.55)`,
-            transform: `scale(${pop})`,
-            opacity: sung ? 1 : 0.9,
-            textShadow: lit
-              ? `0 0 8px ${C.pink}, 0 0 26px ${C.pink}, 0 0 60px ${C.pink}, 0 4px 0 #3b0a2a`
-              : "none",
-            filter: ignite < 1 && sung ? `brightness(${1 + (1 - ignite)})` : undefined,
-          }}
-        >
-          {text}
-        </span>
-      );
-    }
-    case "hook": {
-      if (!sung) return <span style={{ ...base, opacity: 0 }}>{text}</span>;
-      const k = backOut(dt / 0.3);
-      const col = HOOK_COLORS[idx % HOOK_COLORS.length];
-      return (
-        <span
-          style={{
-            ...base,
-            color: "#fff",
-            transform: `scale(${2.4 - 1.4 * k}) rotate(${(1 - clamp01(dt / 0.3)) * (idx % 2 ? 14 : -14)}deg)`,
-            opacity: clamp01(dt / 0.06),
-            textShadow: `0 0 10px ${col}, 0 0 30px ${col}, 0 0 70px ${col}`,
-          }}
-        >
-          {text}
-        </span>
-      );
-    }
-    case "punchline": {
-      if (!sung) return <span style={{ ...base, opacity: 0 }}>{text}</span>;
-      const k = easeOut(dt / 0.14);
-      return (
-        <span
-          style={{
-            ...base,
-            color: active ? "#ffffff" : C.goldLight,
-            transform: `scale(${2.3 - 1.3 * k}) rotate(${(1 - k) * -6}deg)`,
-            opacity: clamp01(dt / 0.05),
-            textShadow: `4px 4px 0 ${C.pink}, 8px 8px 0 ${C.tealDark}, 0 0 30px rgba(0,0,0,0.8)`,
-          }}
-        >
-          {text}
-        </span>
-      );
-    }
-    case "response": {
-      return (
-        <span style={{ ...base, color: C.pinkSoft, textShadow: `0 0 20px ${C.pink}, ${outline}` }}>{text}</span>
-      );
-    }
-    default: {
-      // spoken: smoky blur-in
-      const k = easeOut(dt / 0.4);
-      return (
-        <span
-          style={{
-            ...base,
-            color: active ? "#fff4d6" : C.goldLight,
-            opacity: sung ? k : 0,
-            filter: `blur(${sung ? (1 - k) * 10 : 10}px)`,
-            transform: `translateY(${sung ? (1 - k) * 14 : 14}px)`,
-            textShadow: `0 0 16px rgba(212,175,55,0.6), ${outline}`,
-          }}
-        >
-          {text}
-        </span>
-      );
-    }
+/* ---------- word colouring ---------- */
+const Glyphs: React.FC<{ w: Word; t: number; paper: boolean; mono: boolean }> = ({ w, t, paper, mono }) => {
+  const unsung = paper ? "#a7a4aa" : "#5f5c63";
+  const done = paper ? C.paperInk : C.white;
+  const dur = Math.max(0.1, w.e - w.s);
+  const p = (t - w.s) / dur;
+  const accent = isAccent(w.t);
+  if (p < 0) return <span style={{ color: unsung }}>{w.t}</span>;
+  if (p >= 1) {
+    const col = accent ? C.pink : done;
+    return (
+      <span style={{ color: col, textShadow: paper ? undefined : accent ? `0 0 22px rgba(255,46,138,0.55)` : `0 0 18px rgba(255,255,255,0.22)` }}>{w.t}</span>
+    );
   }
+  // active: letters fill pink left → right
+  const n = w.t.length;
+  const filled = Math.ceil(clamp01(p * 1.15) * n);
+  return (
+    <span style={{ display: "inline-block", transform: `translateY(${-6 * Math.sin(Math.PI * clamp01(p))}px)`, textShadow: paper ? undefined : `0 0 24px rgba(255,46,138,0.7)` }}>
+      <span style={{ color: C.pink }}>{w.t.slice(0, filled)}</span>
+      <span style={{ color: mono ? unsung : unsung }}>{w.t.slice(filled)}</span>
+    </span>
+  );
 };
 
-/** One lyric line inside a zone, with entrance/exit treatment by style. */
-export const LyricLine: React.FC<{
-  line: Line;
-  idx: number;
-  zone: Zone;
-  t: number;
-  win: [number, number];
-  offsetY?: number;
-  sizeScale?: number;
-  debug?: boolean;
-}> = ({ line, zone, t, win, offsetY = 0, sizeScale = 1, debug = false }) => {
-  const spec = SPECS[line.style];
-  const size = fit(line.text, spec, zone, sizeScale);
-  const enter = easeOut((t - win[0] - 0.1) / 0.25);
-  const exit = clamp01((t - win[1]) / EXIT);
-  const style = line.style;
-
-  let transform = "";
-  let opacity = 1;
-  let filter: string | undefined;
-  if (style === "chorus" || style === "hook") {
-    const bounce = beatPulse(t, 7) * 6;
-    transform = `translateY(${-bounce}px) scale(${1 + exit * 0.25})`;
-    opacity = 1 - exit;
-  } else if (style === "punchline") {
-    transform = `translateY(${exit * 60}px)`;
-    opacity = 1 - exit;
-  } else if (style === "response") {
-    const k = backOut((t - line.start + 0.05) / 0.22);
-    transform = `rotate(-7deg) scale(${t < line.start - 0.05 ? 0 : 3 - 2 * k})`;
-    opacity = t < line.start - 0.05 ? 0 : 1 - exit;
-  } else if (style === "prechorus") {
-    const p = clamp01((t - line.start) / Math.max(0.5, line.end - line.start));
-    transform = `translateY(${(1 - enter) * 40 - exit * 70}px) scale(${0.96 + p * 0.08})`;
-    opacity = enter * (1 - exit);
-  } else {
-    transform = `translateY(${(1 - enter) * 40 - exit * 70}px)`;
-    opacity = enter * (1 - exit);
-    filter = exit > 0 ? `blur(${exit * 8}px)` : undefined;
+/* ---------- layouts ---------- */
+const fitSize = (layout: LyricLayout, texts: string[]) => {
+  const longest = Math.max(...texts.map((s) => s.length));
+  const cw = layout.kind === "log" ? 0.6 : 0.56;
+  // allow wrapping into up to 3 rows per lyric line if it is very long
+  let best = 0;
+  for (const rows of [1, 2, 3]) {
+    const s = Math.min(layout.size, (layout.w * rows) / (longest * cw * (rows === 1 ? 1 : 1.12)));
+    best = s;
+    if (s >= layout.size * 0.72) break;
   }
+  return best;
+};
 
-  const plate =
-    style === "punchline" ? (
-      <div
-        style={{
-          position: "absolute",
-          inset: "-24px -48px",
-          border: `4px solid ${C.gold}`,
-          outline: `2px solid ${C.gold}`,
-          outlineOffset: 8,
-          background: "linear-gradient(180deg, rgba(10,16,40,0.92), rgba(5,6,11,0.92))",
-          transform: `scaleX(${easeOut((t - line.start + 0.1) / 0.2)})`,
-          boxShadow: `0 0 40px rgba(255,47,160,0.45)`,
-        }}
-      />
-    ) : style === "response" ? (
-      <div
-        style={{
-          position: "absolute",
-          inset: "-10px -30px",
-          border: `8px solid ${C.pink}`,
-          borderRadius: 14,
-          background: "rgba(26,6,16,0.75)",
-        }}
-      />
-    ) : null;
-
+const BlockGroup: React.FC<{ g: Group; layout: LyricLayout; t: number }> = ({ g, layout, t }) => {
+  const paper = !!layout.paper;
+  const mono = layout.kind === "log";
+  const size = fitSize(layout, g.ids.map((i) => (mono ? "# " : "") + lines[i].text));
+  let wordIndex = 0;
   return (
     <div
       style={{
         position: "absolute",
-        left: zone.x,
-        top: zone.y + offsetY,
-        width: zone.w,
-        height: zone.h,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        pointerEvents: "none",
+        left: layout.x,
+        top: layout.y,
+        width: layout.w,
+        transform: layout.angle ? `rotate(${layout.angle}deg)` : undefined,
+        transformOrigin: "0 0",
+        textAlign: layout.align ?? "left",
+        fontFamily: mono ? F.mono : F.sans,
+        fontWeight: mono ? 400 : 800,
+        fontSize: size,
+        letterSpacing: mono ? 0 : "-0.025em",
+        lineHeight: mono ? 1.45 : 1.06,
       }}
     >
-      <div style={{ position: "relative", transform, opacity, filter, maxWidth: zone.w }}>
-        {!plate && (
-          <div
-            style={{
-              position: "absolute",
-              inset: "-50px -90px",
-              background: `radial-gradient(ellipse 50% 50% at 50% 50%, rgba(3,4,12,${style === "hook" ? 0.25 : 0.62}) 0%, rgba(3,4,12,${style === "hook" ? 0.1 : 0.4}) 55%, transparent 100%)`,
-            }}
-          />
-        )}
-        {plate}
-        <div
-          style={{
-            position: "relative",
-            fontFamily: spec.font,
-            fontSize: size,
-            fontWeight: style === "verse" ? 700 : 400,
-            lineHeight: 1.12,
-            textAlign: "center",
-            letterSpacing: style === "prechorus" ? size * 0.03 : style === "hook" ? size * 0.02 : 0,
-          }}
-        >
-          {line.words.map((w, wi) => (
-            <WordSpan key={wi} w={w} idx={wi} t={t} style={style} spec={spec} debug={debug} />
-          ))}
-        </div>
-        {debug && (
-          <div style={{ position: "absolute", top: -34, left: 0, fontSize: 22, color: line.uncertain ? "#ff6060" : "#9f9", fontFamily: "monospace" }}>
-            {line.id} {line.start.toFixed(2)}–{line.end.toFixed(2)} {line.uncertain ? "UNCERTAIN" : ""}
+      {g.ids.map((li) => {
+        const l = lines[li];
+        const response = l.style === "response";
+        return (
+          <div key={l.id} style={{ marginBottom: mono ? 0 : size * 0.06, paddingLeft: response && !mono ? size * 0.6 : 0 }}>
+            {mono && <span style={{ color: response ? C.pink : paper ? "#a7a4aa" : "#5f5c63" }}>{response ? "→ " : "# "}</span>}
+            {!mono && response && <span style={{ color: C.pink }}>→ </span>}
+            {l.words.map((w, wi) => {
+              const k = wordIndex++;
+              const a = ease((t - g.start - k * 0.02) / 0.22);
+              return (
+                <span key={wi} style={{ display: "inline-block", opacity: a, transform: `translateY(${(1 - a) * 28}px)`, marginRight: "0.24em", whiteSpace: "nowrap" }}>
+                  <Glyphs w={w} t={t} paper={paper} mono={mono} />
+                </span>
+              );
+            })}
           </div>
-        )}
-      </div>
+        );
+      })}
     </div>
   );
 };
 
-/** All lyrics: picks visible lines (max two) and places them in the zone of their scene. */
-export const LyricLayer: React.FC<{
-  zoneOf: (lineIdx: number) => { zone: Zone; scale?: number };
-  debug?: boolean;
-}> = ({ zoneOf, debug = false }) => {
+/** Text that rides an SVG path (one lyric line). */
+const PathGroup: React.FC<{ g: Group; layout: LyricLayout; t: number }> = ({ g, layout, t }) => {
+  const l = lines[g.ids[0]];
+  const id = `lp${l.id}`;
+  const chars: { ch: string; color: string; dy: number; op: number }[] = [];
+  let k = 0;
+  l.words.forEach((w, wi) => {
+    const dur = Math.max(0.1, w.e - w.s);
+    const p = (t - w.s) / dur;
+    const accent = isAccent(w.t);
+    const txt = w.t + (wi < l.words.length - 1 ? " " : "");
+    for (let c = 0; c < txt.length; c++) {
+      const filled = p >= 1 || (p >= 0 && c < Math.ceil(clamp01(p * 1.15) * w.t.length));
+      const color = p >= 1 ? (accent ? C.pink : C.white) : filled ? C.pink : "#5f5c63";
+      const a = ease((t - g.start - k * 0.012) / 0.3);
+      chars.push({ ch: txt[c], color, dy: (1 - a) * 30, op: a });
+      k++;
+    }
+  });
+  return (
+    <svg width={1920} height={1080} style={{ position: "absolute", left: 0, top: 0, overflow: "visible" }}>
+      <defs>
+        <path id={id} d={layout.path} />
+      </defs>
+      <text fontFamily={F.sans} fontWeight={800} fontSize={layout.size} letterSpacing={-1} style={{ filter: "drop-shadow(0 0 14px rgba(255,255,255,0.18))" }}>
+        <textPath href={`#${id}`} startOffset={layout.align === "center" ? "50%" : "0%"} textAnchor={layout.align === "center" ? "middle" : "start"}>
+          {chars.map((c, i) => (
+            <tspan key={i} fill={c.color} opacity={c.op}>
+              {c.ch}
+            </tspan>
+          ))}
+        </textPath>
+      </text>
+    </svg>
+  );
+};
+
+/** Hook: each word lands huge, one after another. */
+const SlamGroup: React.FC<{ g: Group; layout: LyricLayout; t: number }> = ({ g, layout, t }) => {
+  const l = lines[g.ids[0]];
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: layout.x,
+        top: layout.y,
+        width: layout.w,
+        textAlign: "center",
+        fontFamily: F.sans,
+        fontWeight: 800,
+        fontSize: layout.size,
+        lineHeight: 0.95,
+        letterSpacing: "-0.04em",
+        textTransform: "uppercase",
+      }}
+    >
+      {l.words.map((w, i) => {
+        const dt = t - w.s;
+        const k = ease(dt / 0.18);
+        const active = dt >= 0 && dt < Math.max(0.15, w.e - w.s);
+        return (
+          <span
+            key={i}
+            style={{
+              display: "inline-block",
+              marginRight: "0.18em",
+              opacity: dt < -0.02 ? 0 : 1,
+              transform: `scale(${dt < 0 ? 1.6 : 1.6 - 0.6 * k})`,
+              color: active ? C.pink : isAccent(w.t) ? C.pink : C.white,
+              textShadow: active ? `0 0 40px rgba(255,46,138,0.9)` : `0 0 24px rgba(255,255,255,0.25)`,
+            }}
+          >
+            {w.t}
+          </span>
+        );
+      })}
+    </div>
+  );
+};
+
+export const LyricLayer: React.FC<{ groups: Group[]; layoutOf: (g: Group) => LyricLayout }> = ({ groups, layoutOf }) => {
   const f = useCurrentFrame();
   const { fps } = useVideoConfig();
   const t = f / fps;
-  const visible: { i: number; win: [number, number] }[] = [];
-  for (let i = 0; i < lines.length; i++) {
-    const win = lineWindow(i);
-    if (t >= win[0] && t <= win[1] + EXIT) visible.push({ i, win });
-  }
-  const shown = visible.slice(-2);
+  const visible = groups.filter((g) => t >= g.start && t <= g.end + EXIT);
   return (
     <AbsoluteFill style={{ pointerEvents: "none" }}>
-      {shown.map(({ i, win }) => {
-        const { zone, scale } = zoneOf(i);
-        const line = lines[i];
-        const asks = lines[i + 1]?.style === "response" && line.style !== "response";
-        const offsetY = line.style === "response" ? zone.h * 0.32 : asks ? -zone.h * 0.18 : 0;
-        const sizeScale = (scale ?? 1) * (asks ? 0.88 : 1);
+      {visible.slice(-2).map((g) => {
+        const layout = layoutOf(g);
+        const out = clamp01((t - g.end) / EXIT);
+        const Comp = layout.kind === "path" ? PathGroup : layout.kind === "slam" ? SlamGroup : BlockGroup;
         return (
-          <LyricLine key={line.id} line={line} idx={i} zone={zone} t={t} win={win} offsetY={offsetY} sizeScale={sizeScale} debug={debug} />
+          <AbsoluteFill key={g.ids[0]} style={{ opacity: 1 - out, filter: out > 0 ? `blur(${out * 10}px)` : undefined, transform: `translateY(${-out * 30}px)` }}>
+            <Comp g={g} layout={layout} t={t} />
+          </AbsoluteFill>
         );
       })}
     </AbsoluteFill>
   );
 };
-
-export const easing = { easeOut, backOut, clamp01 };
-export const interp = (t: number, a: number, b: number, from: number, to: number) =>
-  interpolate(t, [a, b], [from, to], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) });

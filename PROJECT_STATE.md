@@ -11,10 +11,13 @@ Animated kinetic lyric video (Remotion 4, React/TS), 1920×1080 @ 30 fps, full t
 - `src/data/lyrics-timing.json` — word timings (authority = recording). Edit `s`/`e` per word, or `meta.globalOffsetSec` to shift all.
 - `src/data/scene-plan.json` — scene timeline: start line/second, scene, lyric zone, per-line props, transition.
 - `src/data/audio-analysis.json` — tempo (128.8 BPM), beat phase, accent hits, energy (drives pulses/flashes).
-- `src/lyrics/Lyrics.tsx` — reusable kinetic text: verse / prechorus / chorus (neon tubes) / hook (Monoton burst) / punchline (slam plate) / response (stamp) / spoken (smoky blur).
-- `src/components/characters/` — Diva (poses w/ 2-bone IK, expressions, lip-sync from word timings), Grandma, Cat, Cow, Couple.
-- `src/components/props/Props.tsx` — ~36 illustrated joke props. `src/components/deco/Deco.tsx` — camera/parallax, sunbursts, gears, circuits, curtains, floors, etc.
-- `src/scenes/` — 18 scene components; `src/DigitalDiva.tsx` — assembly, Art Deco transitions, overlays, audio.
+- Style (v2, per user references): monochrome line-art diagrams + HUD annotations, hot-pink accent, no singer character.
+  The glowing pink pixel stands in for the AI.
+- `src/lyrics/Lyrics.tsx` — karaoke couplets: unsung grey → letters fill pink as sung → white (key nouns stay pink).
+  Layouts: block, log (mono, paper), path (text rides an SVG curve), slam (hooks).
+- `src/components/hud.tsx` — camera/parallax, grids, self-drawing strokes, dimension lines, anchors, HUD labels.
+- `src/components/art.tsx` — monoline drawings (Grandma, cat, cow, couple, duck, phone, computer, printer, toaster…).
+- `src/scenes/` — 21 scene components; `src/DigitalDiva.tsx` — assembly, wipe/glitch/flash transitions, audio.
 
 ## Alignment pipeline (local, open-source, no uploads)
 `npm run align` (Python 3 + `pip install -r scripts/align/requirements.txt`, ffmpeg on PATH):

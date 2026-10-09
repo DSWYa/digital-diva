@@ -1,19 +1,10 @@
-import "@fontsource/limelight/400.css";
-import "@fontsource/josefin-sans/600.css";
-import "@fontsource/josefin-sans/700.css";
-import "@fontsource/righteous/400.css";
-import "@fontsource/monoton/400.css";
-import "@fontsource/poiret-one/400.css";
+import "@fontsource/archivo/700.css";
+import "@fontsource/archivo/800.css";
+import "@fontsource/ibm-plex-mono/400.css";
+import "@fontsource/ibm-plex-mono/600.css";
 import { continueRender, delayRender } from "remotion";
 
-const specs = [
-  "400 80px Limelight",
-  "700 80px 'Josefin Sans'",
-  "600 80px 'Josefin Sans'",
-  "400 80px Righteous",
-  "400 80px Monoton",
-  "400 80px 'Poiret One'",
-];
+const specs = ["700 80px Archivo", "800 80px Archivo", "400 40px 'IBM Plex Mono'", "600 40px 'IBM Plex Mono'"];
 
 let started = false;
 export const ensureFonts = () => {

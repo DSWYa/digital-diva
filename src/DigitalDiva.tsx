@@ -1,97 +1,81 @@
 import React from "react";
-import { AbsoluteFill, Img, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
+import { AbsoluteFill, Img, random, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { Audio } from "@remotion/media";
 import { C, H, W } from "./theme";
 import { ensureFonts } from "./fonts";
-import { segments, Segment, zoneOfLine } from "./lib/plan";
+import { groups, layoutOfGroup, segments, Segment } from "./lib/plan";
 import { hitPulse } from "./lib/timing";
 import { LyricLayer } from "./lyrics/Lyrics";
-import { DecoFrame, Vignette } from "./components/deco/Deco";
+import { ease } from "./components/hud";
 import { SceneProps } from "./scenes/common";
-import { Boot, GrandmaScene, Marquee, Showcase, Storm, Switchboard, WeddingCow } from "./scenes/ScenesA";
-import { CatCode, Chorus, ComeOn, ErrorScene, Kitchen, Laptop, Lounge, Philosophy, Phone, Shutdown, ToasterScene } from "./scenes/ScenesB";
+import { Filter, Inbox, Notify, Queue, Session, Specimen, Title } from "./scenes/ScenesA";
+import { Bridge, CatScene, Chorus, ComeOn, Drop, ErrorScene, GlassesScene, Kitchen, LaptopScene, Montage, Neural, QA, Shutdown, Solo } from "./scenes/ScenesB";
 
 const SCENES: Record<string, React.FC<SceneProps>> = {
-  boot: Boot,
-  marquee: Marquee,
-  grandma: GrandmaScene,
-  switchboard: Switchboard,
-  showcase: Showcase,
-  weddingCow: WeddingCow,
-  storm: Storm,
+  session: Session,
+  title: Title,
+  inbox: Inbox,
+  filter: Filter,
+  queue: Queue,
+  notify: Notify,
+  specimen: Specimen,
   chorus: Chorus,
-  catCode: CatCode,
+  solo: Solo,
+  qa: QA,
+  cat: CatScene,
   kitchen: Kitchen,
-  philosophy: Philosophy,
-  laptop: Laptop,
-  lounge: Lounge,
+  neural: Neural,
+  laptop: LaptopScene,
+  bridge: Bridge,
   error: ErrorScene,
-  phone: Phone,
-  toaster: ToasterScene,
+  drop: Drop,
+  montage: Montage,
+  glasses: GlassesScene,
   shutdown: Shutdown,
   comeon: ComeOn,
 };
 
-const TR: Record<Segment["transition"], number> = { iris: 0.45, fan: 0.5, blinds: 0.45, slide: 0.4, fade: 0.6, flash: 0, cut: 0 };
-const ease = (x: number) => 1 - Math.pow(1 - Math.max(0, Math.min(1, x)), 3);
+const TR: Record<Segment["transition"], number> = { wipe: 0.4, glitch: 0.25, fade: 0.6, flash: 0, cut: 0 };
 
 const TransitionMask: React.FC<{ seg: Segment; t: number; children: React.ReactNode }> = ({ seg, t, children }) => {
   const d = TR[seg.transition];
   const p = d ? ease((t - seg.start) / d) : 1;
   if (p >= 1) return <AbsoluteFill>{children}</AbsoluteFill>;
-  let style: React.CSSProperties = {};
-  let edge: React.ReactNode = null;
-  switch (seg.transition) {
-    case "iris": {
-      const r = p * 1150;
-      style = { clipPath: `circle(${r}px at 50% 50%)` };
-      edge = (
-        <div style={{ position: "absolute", left: W / 2 - r, top: H / 2 - r, width: r * 2, height: r * 2, borderRadius: "50%", border: `10px solid ${C.gold}`, boxShadow: `0 0 30px ${C.gold}` }} />
-      );
-      break;
-    }
-    case "fan": {
-      const a = p * 180;
-      const mask = `conic-gradient(from -90deg at 50% 100%, #000 0deg, #000 ${a}deg, transparent ${a + 0.5}deg)`;
-      style = { WebkitMaskImage: mask, maskImage: mask };
-      const rad = ((a - 90) * Math.PI) / 180;
-      edge = (
-        <svg width={W} height={H} style={{ position: "absolute" }}>
-          <line x1={W / 2} y1={H} x2={W / 2 + Math.sin(rad) * 2400} y2={H - Math.cos(rad) * 2400} stroke={C.gold} strokeWidth={10} style={{ filter: `drop-shadow(0 0 12px ${C.gold})` }} />
-        </svg>
-      );
-      break;
-    }
-    case "blinds": {
-      const w = p * 160;
-      const mask = `repeating-linear-gradient(90deg, #000 0px, #000 ${w}px, transparent ${w}px, transparent 160px)`;
-      style = { WebkitMaskImage: mask, maskImage: mask };
-      break;
-    }
-    case "slide":
-      style = { transform: `translateX(${(1 - p) * W}px)` };
-      edge = <div style={{ position: "absolute", top: 0, bottom: 0, left: (1 - p) * W - 12, width: 12, background: C.gold, boxShadow: `0 0 30px ${C.gold}` }} />;
-      break;
-    case "fade":
-      style = { opacity: p };
-      break;
-    default:
-      break;
+  if (seg.transition === "wipe") {
+    const x = p * W;
+    return (
+      <>
+        <AbsoluteFill style={{ clipPath: `inset(0 ${W - x}px 0 0)` }}>{children}</AbsoluteFill>
+        <div style={{ position: "absolute", top: 0, bottom: 0, left: x - 1, width: 2, background: C.pink, boxShadow: `0 0 24px ${C.pink}` }} />
+      </>
+    );
   }
-  return (
-    <>
-      <AbsoluteFill style={style}>{children}</AbsoluteFill>
-      {edge}
-    </>
-  );
+  if (seg.transition === "glitch") {
+    const f = Math.floor(t * 30);
+    const slices = 9;
+    return (
+      <>
+        {new Array(slices).fill(0).map((_, i) => {
+          const show = random(`gl${seg.index}${i}`) < p * 1.3;
+          const top = (i / slices) * H;
+          return (
+            <AbsoluteFill key={i} style={{ clipPath: `inset(${top}px 0 ${H - top - H / slices}px 0)`, opacity: show ? 1 : 0, transform: `translateX(${(random(`gx${f}${i}`) - 0.5) * 120 * (1 - p)}px)` }}>
+              {children}
+            </AbsoluteFill>
+          );
+        })}
+      </>
+    );
+  }
+  return <AbsoluteFill style={{ opacity: p }}>{children}</AbsoluteFill>;
 };
 
 const SceneStack: React.FC<{ t: number }> = ({ t }) => {
-  const active: Segment[] = [];
-  for (const s of segments) {
-    const tail = segments[s.index + 1] ? TR[segments[s.index + 1].transition] : 0;
-    if (t >= s.start && t < s.end + tail) active.push(s);
-  }
+  const active = segments.filter((s) => {
+    const next = segments[s.index + 1];
+    const tail = next ? TR[next.transition] : 0;
+    return t >= s.start && t < s.end + tail;
+  });
   return (
     <>
       {active.map((seg) => {
@@ -103,11 +87,10 @@ const SceneStack: React.FC<{ t: number }> = ({ t }) => {
           </TransitionMask>
         );
       })}
-      {/* flash transitions */}
       {active
-        .filter((s) => s.transition === "flash" && t - s.start < 0.35)
+        .filter((s) => s.transition === "flash" && t - s.start < 0.3)
         .map((s) => (
-          <AbsoluteFill key={`f${s.index}`} style={{ background: `radial-gradient(circle, #fff 0%, ${C.pinkSoft} 60%, ${C.pink} 100%)`, opacity: 1 - (t - s.start) / 0.35 }} />
+          <AbsoluteFill key={`f${s.index}`} style={{ background: `radial-gradient(circle, #ffffff 0%, ${C.pink} 70%)`, opacity: 0.85 * (1 - (t - s.start) / 0.3) }} />
         ))}
     </>
   );
@@ -122,17 +105,15 @@ export const DigitalDiva: React.FC<DigitalDivaProps> = ({ showTimingDebug }) => 
   const t = frame / fps;
   const hit = hitPulse(t);
   return (
-    <AbsoluteFill style={{ backgroundColor: C.black, overflow: "hidden" }}>
+    <AbsoluteFill style={{ backgroundColor: C.bg, overflow: "hidden" }}>
       <Audio src={staticFile("audio/digital-diva.mp3")} />
       <SceneStack t={t} />
-      <LyricLayer zoneOf={zoneOfLine} debug={showTimingDebug} />
-      {/* musical accent glow */}
-      <AbsoluteFill style={{ background: `radial-gradient(ellipse at 50% 110%, ${C.gold} 0%, transparent 55%)`, opacity: hit * 0.12, mixBlendMode: "screen", pointerEvents: "none" }} />
-      <Vignette strength={0.6} />
-      <Img src={staticFile("noise.png")} style={{ position: "absolute", left: -((frame * 137) % 512), top: -((frame * 71) % 512), width: W + 1024, height: H + 1024, objectFit: "none", opacity: 0.05, mixBlendMode: "overlay", pointerEvents: "none" }} />
-      <DecoFrame opacity={0.55} />
+      <LyricLayer groups={groups} layoutOf={layoutOfGroup} />
+      <AbsoluteFill style={{ background: `radial-gradient(ellipse at 50% 120%, ${C.pink} 0%, transparent 50%)`, opacity: hit * 0.1, mixBlendMode: "screen", pointerEvents: "none" }} />
+      <AbsoluteFill style={{ background: "radial-gradient(ellipse 80% 75% at 50% 50%, transparent 60%, rgba(0,0,0,0.45) 100%)", pointerEvents: "none" }} />
+      <Img src={staticFile("noise.png")} style={{ position: "absolute", left: -((frame * 137) % 512), top: -((frame * 71) % 512), width: W + 1024, height: H + 1024, objectFit: "none", opacity: 0.045, mixBlendMode: "overlay", pointerEvents: "none" }} />
       {showTimingDebug && (
-        <div style={{ position: "absolute", right: 40, bottom: 40, fontFamily: "monospace", fontSize: 28, color: "#9f9", background: "rgba(0,0,0,0.6)", padding: 8 }}>
+        <div style={{ position: "absolute", right: 40, bottom: 70, fontFamily: "monospace", fontSize: 26, color: "#9f9", background: "rgba(0,0,0,0.7)", padding: 8 }}>
           {t.toFixed(2)}s · {segments.filter((s) => t >= s.start && t < s.end).map((s) => s.scene).join(",")}
         </div>
       )}
