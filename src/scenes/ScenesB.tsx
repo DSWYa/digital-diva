@@ -30,24 +30,27 @@ export const Chorus: React.FC<SceneProps> = ({ seg, t }) => {
   const ax = 960;
   const ay = 700;
   return (
-    <Camera zoom={1 + pulse * 0.012 + burst * 0.05} shake={burst * 16 + hit * 3}>
+    <Camera zoom={1.02 + pulse * 0.03 + burst * 0.05} rot={(b.n % 2 ? 1 : -1) * pulse * 0.6} shake={burst * 16 + hit * 6}>
       <Layer depth={0}>
         <Dark glow={pulse * 0.5 + burst} />
       </Layer>
       <Layer depth={0.3}>
-        <Floor horizon={620} speed={0.04} color={burst > 0.2 ? C.pink : "#3d3a41"} />
+        <Floor horizon={620} speed={0.12} color={burst > 0.2 || pulse > 0.75 ? C.pink : "#4a474e"} />
+        <Canvas>
+          <line x1={0} y1={620} x2={W} y2={620} stroke={C.pink} strokeWidth={2 + pulse * 4} opacity={0.25 + pulse * 0.75} style={{ filter: `drop-shadow(0 0 ${12 * pulse}px ${C.pink})` }} />
+        </Canvas>
       </Layer>
       <Layer depth={0.5}>
         <Hud tl="chorus.live" tr={`bar ${Math.floor(b.n / 4) + 1} · beat ${(b.n % 4) + 1}`} bl={name !== "hook" ? name : undefined} br={`energy ${Math.round(energyAt(t) * 100)}%`} accent="tr" />
       </Layer>
       <Layer depth={1}>
         <Canvas>
-          {(name === "hook" || burst > 0) &&
-            new Array(28).fill(0).map((_, i) => {
-              const a = (i / 28) * Math.PI * 2;
-              const r0 = 200 + burst * 120;
-              const r1 = r0 + 300 * burst + 40;
-              return <line key={i} x1={W / 2 + Math.cos(a) * r0} y1={H / 2 + Math.sin(a) * r0} x2={W / 2 + Math.cos(a) * r1} y2={H / 2 + Math.sin(a) * r1} stroke={i % 2 ? C.pink : C.line} strokeWidth={2} opacity={0.3 + burst * 0.7} />;
+          {new Array(28).fill(0).map((_, i) => {
+              // rays pulse on every beat; the hook words blow them wide open
+              const a = (i / 28) * Math.PI * 2 + b.n * 0.11;
+              const r0 = 200 + burst * 120 + pulse * 40;
+              const r1 = r0 + 300 * burst + 40 + pulse * 140;
+              return <line key={i} x1={W / 2 + Math.cos(a) * r0} y1={H / 2 + Math.sin(a) * r0} x2={W / 2 + Math.cos(a) * r1} y2={H / 2 + Math.sin(a) * r1} stroke={i % 2 ? C.pink : C.line} strokeWidth={2} opacity={(name === "hook" ? 0.3 : 0.12) + pulse * 0.25 + burst * 0.7} />;
             })}
           {name === "stage" && (
             <g>
@@ -758,7 +761,20 @@ export const Shutdown: React.FC<SceneProps> = ({ seg, t, lt }) => {
       {lt > 1.6 && (
         <>
           <Hud tl="sleep mode" tr="zzz" />
-          <Pixel x={W / 2} y={H / 2} size={14} pulse={left < 0.9 ? 1 : 0} />
+          <Canvas>
+            {/* the voice trace from the intro, flat-lined and breathing */}
+            <line x1={160} y1={H / 2} x2={W - 160} y2={H / 2} stroke={C.dim} strokeWidth={1.5} opacity={0.5 + 0.3 * Math.sin(lt * 2.2)} />
+            <Note x={160} y={H / 2 - 18} size={15} upper>voice.trace — standby</Note>
+            {["z", "z", "z"].map((z, i) => {
+              const q = (lt * 0.5 + i / 3) % 1;
+              return (
+                <text key={i} x={W / 2 + 30 + q * 120} y={H / 2 - 30 - q * 160} fontFamily={F.sans} fontWeight={800} fontSize={40 + i * 16} fill={C.line} opacity={(1 - q) * 0.8}>
+                  {z}
+                </text>
+              );
+            })}
+          </Canvas>
+          <Pixel x={W / 2} y={H / 2} size={14 + 6 * Math.sin(lt * 2.2)} pulse={left < 0.9 ? 1 : 0} />
         </>
       )}
       {left < 0.9 && (
